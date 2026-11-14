@@ -1193,17 +1193,37 @@ def init_database():
                     "category": "gift",
                     "type": "virtual",
                     "price": gift["price"],
+                    "origin_price": 0,
+                    "stock": -1,
+                    "image_url": None,
                     "currency": gift["currency"],
                     "favorability_boost": gift["favorability"],
+                    "unlock_favorability": 0,
+                    "sales": 0,
+                    "specs": None,
+                    "ship_from": None,
+                    "available": 1,
+                    "created_at": datetime.now(),
                     "description": f"送出「{gift['name']}」可增加双方好感度",
                 })
             # 2. 实物商品 + 虚拟道具（已统一到 SHOP_PRODUCTS）
             for p in SHOP_PRODUCTS:
                 row = dict(p)
-                # 清理一些 shop_items 表里没有的 key（保留表里有的）
-                for extra in ("specs", "ship_from"):
-                    # specs/ship_from 表里有列，保留
-                    pass
+                # 补齐 shop_items 表所有列的默认值，避免批量插入时部分字典缺键
+                row.setdefault("category", "gift")
+                row.setdefault("type", "virtual")
+                row.setdefault("origin_price", 0)
+                row.setdefault("stock", -1)
+                row.setdefault("image_url", None)
+                row.setdefault("description", "")
+                row.setdefault("favorability_boost", 0)
+                row.setdefault("unlock_favorability", 0)
+                row.setdefault("sales", 0)
+                row.setdefault("specs", None)
+                row.setdefault("ship_from", None)
+                row.setdefault("currency", "coins")
+                row.setdefault("available", 1)
+                row.setdefault("created_at", datetime.now())
                 all_shop.append(row)
             conn.execute(insert(shop_items), all_shop)
 
