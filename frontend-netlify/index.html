@@ -1,0 +1,2565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#0d0b1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>圈圈语音社 — 遇见同频的人</title>
+<link rel="stylesheet" href="styles.css?v=11">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<!-- ============ 登录/欢迎页 ============ -->
+<div class="splash hide" id="splash">
+  <div class="splash-bg"></div>
+  <div class="splash-scroll">
+    <div class="splash-content">
+      <div class="splash-logo">
+        <div class="logo-ring"></div>
+        <i class="fa-solid fa-microphone-lines"></i>
+      </div>
+      <h1 class="splash-title">圈圈语音社</h1>
+      <p class="splash-sub">遇见同频的人 · 听见有趣的灵魂</p>
+      <div class="wave-bars big splash-wave">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+
+      <!-- Tab 切换：验证码 / 第三方 -->
+      <div class="login-tabs">
+        <button class="login-tab active" data-tab="phone">
+          <i class="fa-solid fa-mobile-screen-button"></i> 验证码登录
+        </button>
+        <button class="login-tab" data-tab="oauth">
+          <i class="fa-solid fa-share-nodes"></i> 第三方登录
+        </button>
+      </div>
+
+      <!-- 手机号 + 验证码 -->
+      <form class="login-form" id="loginForm" onsubmit="return false;" novalidate>
+        <div class="login-field">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+          <input type="tel" id="loginPhone" placeholder="请输入手机号" maxlength="11" autocomplete="tel" inputmode="numeric">
+        </div>
+        <div class="login-field login-field-code">
+          <i class="fa-solid fa-shield-halved"></i>
+          <input type="text" id="loginCode" placeholder="验证码" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
+          <button type="button" class="code-btn" id="sendCodeBtn">获取验证码</button>
+        </div>
+        <div class="login-field">
+          <i class="fa-solid fa-id-card"></i>
+          <input type="text" id="loginNickname" placeholder="昵称（可选，留空自动生成）" maxlength="20" autocomplete="nickname">
+        </div>
+        <button class="btn-primary big login-submit" id="splashEnter" type="submit">
+          <i class="fa-solid fa-paper-plane"></i> 立即进入
+        </button>
+      </form>
+
+      <!-- 第三方登录 -->
+      <div class="login-oauth hidden" id="loginOauth">
+        <p class="oauth-tip">选择平台一键登录，首次登录自动创建账号</p>
+        <div class="oauth-grid">
+          <button class="oauth-btn wechat" data-provider="wechat" type="button">
+            <i class="fa-brands fa-weixin"></i>
+            <span>微信登录</span>
+          </button>
+          <button class="oauth-btn qq" data-provider="qq" type="button">
+            <i class="fa-brands fa-qq"></i>
+            <span>QQ 登录</span>
+          </button>
+          <button class="oauth-btn apple" data-provider="apple" type="button">
+            <i class="fa-brands fa-apple"></i>
+            <span>Apple 登录</span>
+          </button>
+        </div>
+      </div>
+
+      <p class="agreement">登录即代表同意 <a href="#">《用户协议》</a> 和 <a href="#">《隐私政策》</a></p>
+      <p class="login-hint">💡 验证码将通过短信发送到您的手机</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 侧边导航 ============ -->
+<nav class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="logo-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+    <div class="brand-text">
+      <span class="brand-name">圈圈语音社</span>
+      <span class="brand-sub">Circle · Voice · Meet</span>
+    </div>
+  </div>
+
+  <div class="nav-sections">
+    <div class="nav-item active" data-view="discover">
+      <i class="fa-solid fa-compass"></i><span>发现广场</span>
+    </div>
+    <div class="nav-item" data-view="match">
+      <i class="fa-solid fa-heart"></i><span>匹配中心</span>
+      <span class="badge hidden" id="sideMatchBadge">0</span>
+    </div>
+    <div class="nav-item" data-view="voice">
+      <i class="fa-solid fa-microphone"></i><span>语音房间</span>
+      <span class="dot"></span>
+    </div>
+    <div class="nav-item" data-view="circle">
+      <i class="fa-solid fa-users-rectangle"></i><span>圈圈频道</span>
+    </div>
+    <div class="nav-item" data-view="chat">
+      <i class="fa-solid fa-comment-dots"></i><span>消息中心</span>
+      <span class="badge hidden" id="sideChatBadge">0</span>
+    </div>
+    <div class="nav-item" data-view="profile">
+      <i class="fa-solid fa-user"></i><span>个人主页</span>
+    </div>
+    <div class="nav-item" data-view="shop">
+      <i class="fa-solid fa-store"></i><span>商城中心</span>
+    </div>
+    <div class="nav-item" data-view="favorites">
+      <i class="fa-solid fa-fire"></i><span>好感度</span>
+    </div>
+    <div class="nav-item" data-view="relationships">
+      <i class="fa-solid fa-ring"></i><span>我的关系</span>
+    </div>
+  </div>
+
+  <div class="nav-bottom">
+    <div class="nav-item" data-action="notifications">
+      <i class="fa-solid fa-bell"></i><span>通知中心</span>
+      <span class="badge hidden" id="sideNotifBadge">0</span>
+    </div>
+    <div class="nav-item" data-action="wallet">
+      <i class="fa-solid fa-coins"></i><span>我的钱包</span>
+      <span class="coin-amt">💎 128</span>
+    </div>
+    <div class="nav-item" data-action="settings">
+      <i class="fa-solid fa-gear"></i><span>设置</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ 主内容区 ============ -->
+<main class="main">
+
+  <header class="topbar">
+    <button class="hamburger" id="hamburgerBtn"><i class="fa-solid fa-bars"></i></button>
+    <div class="search-box" data-action="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="搜索频道、用户、话题..." readonly>
+      <kbd>Ctrl K</kbd>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" data-action="notifications" title="通知"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></button>
+      <button class="icon-btn" data-action="wallet" title="钱包"><i class="fa-solid fa-wallet"></i></button>
+      <button class="icon-btn" data-action="settings" title="设置"><i class="fa-solid fa-gear"></i></button>
+      <button class="icon-btn" data-action="theme" title="切换主题"><i class="fa-solid fa-moon"></i></button>
+      <button class="btn-primary" id="startVoiceBtn"><i class="fa-solid fa-plus"></i> 开语音房</button>
+    </div>
+  </header>
+
+  <!-- ==================== 发现广场 ==================== -->
+  <section class="view" id="view-discover">
+    <div class="view-header">
+      <h1 class="view-title">发现广场</h1>
+      <p class="view-desc">实时动态 · 附近的人 · 热门话题</p>
+    </div>
+
+    <div class="banner-carousel">
+      <div class="banner-slide active" style="--bg-from:#6366f1;--bg-to:#a855f7;">
+        <div class="banner-content">
+          <span class="banner-tag">🎤 限时活动</span>
+          <h2>七夕语音配对夜</h2>
+          <p>进入任意语音房，有机会匹配同城嘉宾连麦</p>
+          <button class="btn-white">立即参加 →</button>
+        </div>
+        <div class="banner-visual">
+          <div class="wave-bars big">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="discover-grid">
+      <div class="feed-column">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-fire"></i> 热门动态</h3>
+          <button class="btn-primary small" id="postBtn"><i class="fa-solid fa-pen-to-square"></i> 发布动态</button>
+        </div>
+        <div class="tabs">
+          <span class="tab active">推荐</span>
+          <span class="tab">关注</span>
+          <span class="tab">同城</span>
+        </div>
+
+        <article class="post-card">
+          <div class="post-header">
+            <div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=young%20man%20portrait%20gaming%20setup%20neon%20light&image_size=square" alt=""></div>
+            <div class="post-meta">
+              <div class="post-author">电竞老王 <span class="verified"><i class="fa-solid fa-circle-check"></i></span></div>
+              <div class="post-sub">上海 · 2公里内 · 3分钟前</div>
+            </div>
+            <button class="icon-btn-sm"><i class="fa-solid fa-ellipsis"></i></button>
+          </div>
+          <p class="post-text">今晚LOL开黑，缺个辅助位！来个会玩的，赢了发红包 🎮💸</p>
+          <div class="post-tags">#英雄联盟 #组队开黑</div>
+          <div class="post-media"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=league%20of%20legends%20gaming%20room%20rgb%20setup&image_size=landscape_4_3" alt=""></div>
+          <div class="post-actions">
+            <button><i class="fa-regular fa-heart"></i> 128</button>
+            <button><i class="fa-regular fa-comment"></i> 46</button>
+            <button><i class="fa-regular fa-share-from-square"></i> 分享</button>
+            <button class="enter-room"><i class="fa-solid fa-microphone"></i> 进入语音房</button>
+          </div>
+        </article>
+
+        <article class="post-card">
+          <div class="post-header">
+            <div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=anime%20girl%20pink%20hair%20kawaii%20style&image_size=square" alt=""></div>
+            <div class="post-meta">
+              <div class="post-author">奶糖不加冰</div>
+              <div class="post-sub">北京 · 5公里内 · 15分钟前</div>
+            </div>
+            <button class="icon-btn-sm"><i class="fa-solid fa-ellipsis"></i></button>
+          </div>
+          <p class="post-text">有人今晚一起连麦看恐怖片吗？我带爆米花🍿 一个人看真的好怕 😭</p>
+          <div class="post-tags">#看电影 #连麦陪伴</div>
+          <div class="post-actions">
+            <button><i class="fa-regular fa-heart"></i> 342</button>
+            <button><i class="fa-regular fa-comment"></i> 89</button>
+            <button><i class="fa-regular fa-share-from-square"></i> 分享</button>
+            <button class="enter-room"><i class="fa-solid fa-microphone"></i> 进入语音房</button>
+          </div>
+        </article>
+
+        <article class="post-card">
+          <div class="post-header">
+            <div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cool%20boy%20with%20headphones%20studio&image_size=square" alt=""></div>
+            <div class="post-meta">
+              <div class="post-author">独立音乐人阿树 <span class="tag-sm blue">音乐人</span></div>
+              <div class="post-sub">成都 · 1.2公里 · 半小时前</div>
+            </div>
+            <button class="icon-btn-sm"><i class="fa-solid fa-ellipsis"></i></button>
+          </div>
+          <p class="post-text">新写了一首歌《凌晨三点的风》，欢迎来我语音房听Demo，给点意见～🎧</p>
+          <div class="post-media audio">
+            <div class="audio-player">
+              <button class="play-btn"><i class="fa-solid fa-play"></i></button>
+              <div class="waveform">
+                <span style="height:30%"></span><span style="height:60%"></span><span style="height:45%"></span>
+                <span style="height:80%"></span><span style="height:55%"></span><span style="height:90%"></span>
+                <span style="height:40%"></span><span style="height:70%"></span><span style="height:50%"></span>
+                <span style="height:85%"></span><span style="height:35%"></span><span style="height:65%"></span>
+              </div>
+              <span class="time">00:32</span>
+            </div>
+          </div>
+          <div class="post-actions">
+            <button><i class="fa-solid fa-heart"></i> 1.2k</button>
+            <button><i class="fa-regular fa-comment"></i> 234</button>
+            <button><i class="fa-regular fa-share-from-square"></i> 分享</button>
+            <button class="enter-room"><i class="fa-solid fa-microphone"></i> 进入语音房</button>
+          </div>
+        </article>
+      </div>
+
+      <aside class="side-column">
+        <div class="panel">
+          <div class="panel-header"><h4><i class="fa-solid fa-location-crosshairs"></i> 附近的人</h4><a href="#" class="link">查看全部 →</a></div>
+          <div class="nearby-list">
+            <div class="nearby-card"><div class="avatar ring-online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=girl%20smiling%20outdoor%20coffee&image_size=square" alt=""></div><div class="nearby-info"><div class="nearby-name">小鹿乱撞</div><div class="nearby-dist">0.8km · 在语音房</div></div><button class="btn-sm">打招呼</button></div>
+            <div class="nearby-card"><div class="avatar ring-online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=guy%20beanie%20casual%20city&image_size=square" alt=""></div><div class="nearby-info"><div class="nearby-name">南城以北</div><div class="nearby-dist">1.5km · 在线</div></div><button class="btn-sm outline">关注</button></div>
+            <div class="nearby-card"><div class="avatar ring-busy"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=girl%20glasses%20library%20aesthetic&image_size=square" alt=""></div><div class="nearby-info"><div class="nearby-name">读书人小月</div><div class="nearby-dist">2.1km · 忙碌中</div></div><button class="btn-sm">打招呼</button></div>
+            <div class="nearby-card"><div class="avatar ring-online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=boy%20anime%20style%20cute&image_size=square" alt=""></div><div class="nearby-info"><div class="nearby-name">星野银河</div><div class="nearby-dist">2.8km · 在语音房</div></div><button class="btn-sm outline">关注</button></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><h4><i class="fa-solid fa-fire"></i> 热门圈圈</h4><a href="#" class="link">更多 →</a></div>
+          <div class="hot-circles">
+            <a class="hot-circle-item" href="#"><span class="rank">1</span><div class="circle-ico gaming">🎮</div><div class="circle-info"><div class="circle-name">LOL英雄联盟圈</div><div class="circle-meta">12.8万成员 · 今日 2.3k 发帖</div></div></a>
+            <a class="hot-circle-item" href="#"><span class="rank">2</span><div class="circle-ico music">🎵</div><div class="circle-info"><div class="circle-name">独立音乐分享圈</div><div class="circle-meta">8.6万成员 · 今日 1.8k 发帖</div></div></a>
+            <a class="hot-circle-item" href="#"><span class="rank">3</span><div class="circle-ico anime">🌸</div><div class="circle-info"><div class="circle-name">二次元同好圈</div><div class="circle-meta">25.3万成员 · 今日 5.1k 发帖</div></div></a>
+            <a class="hot-circle-item" href="#"><span class="rank">4</span><div class="circle-ico love">💕</div><div class="circle-info"><div class="circle-name">单身交友圈</div><div class="circle-meta">18.9万成员 · 今日 3.7k 发帖</div></div></a>
+          </div>
+        </div>
+
+        <div class="panel stats-panel">
+          <div class="stat"><span class="stat-num">12,847</span><span class="stat-label">当前在线</span></div>
+          <div class="stat"><span class="stat-num">3,256</span><span class="stat-label">语音房</span></div>
+          <div class="stat"><span class="stat-num">98</span><span class="stat-label">同城人数</span></div>
+        </div>
+
+        <div class="panel task-panel">
+          <h4><i class="fa-solid fa-list-check"></i> 每日任务</h4>
+          <div class="task-item"><span class="task-ico">🎯</span><span class="task-text">登录签到</span><span class="task-reward">+10💎</span><button class="btn-sm tiny done">已完成</button></div>
+          <div class="task-item"><span class="task-ico">📝</span><span class="task-text">发布 1 条动态</span><span class="task-reward">+20💎</span><button class="btn-sm tiny">去完成</button></div>
+          <div class="task-item"><span class="task-ico">🎤</span><span class="task-text">进入 3 个语音房</span><span class="task-reward">+30💎</span><button class="btn-sm tiny progress">2/3</button></div>
+          <div class="task-item"><span class="task-ico">💬</span><span class="task-text">匹配 5 个人</span><span class="task-reward">+50💎</span><button class="btn-sm tiny">去完成</button></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ==================== 匹配中心 ==================== -->
+  <section class="view hidden" id="view-match">
+    <div class="view-header">
+      <h1 class="view-title">匹配中心</h1>
+      <p class="view-desc">双向喜欢才能聊天 · 保护你的隐私</p>
+    </div>
+
+    <!-- 定位栏 -->
+    <div class="match-location-bar">
+      <span class="loc-pin"><i class="fa-solid fa-location-dot"></i></span>
+      <span class="loc-text">📍 上海 · 浦东新区 · 已获取定位 · 5km范围</span>
+      <span class="loc-status"><span class="green-dot"></span> 定位成功</span>
+      <button class="loc-switch" id="locSwitchBtn"><i class="fa-solid fa-arrow-right-arrow-left"></i> 切换城市</button>
+    </div>
+
+    <!-- 实名认证闸门 -->
+    <div class="match-realname-gate unverified" id="matchRealnameGate">
+      <i class="fa-solid fa-shield-halved"></i>
+      <div class="gate-text">
+        <strong>🔒 匹配中心需要实名认证</strong>
+        <p>为了保护双方真实安全，请先完成实名认证</p>
+      </div>
+      <button class="gate-btn" id="goRealnameBtn"><i class="fa-solid fa-user-check"></i> 去实名</button>
+    </div>
+
+    <div class="match-layout">
+      <div class="match-stage">
+        <div class="card-stack" id="cardStack">
+          <!-- 动态加载卡片 -->
+          <div class="match-empty-state">
+            <div class="empty-emoji">😴</div>
+            <div class="empty-title">附近暂时没有更多有趣的人啦</div>
+            <button class="btn-primary tiny" id="expandRangeBtn"><i class="fa-solid fa-expand"></i> 扩大搜索范围</button>
+          </div>
+        </div>
+        <div class="match-actions">
+          <button class="action-btn rewind" title="反悔"><i class="fa-solid fa-rotate-left"></i></button>
+          <button class="action-btn nope" id="nopeBtn" title="不感兴趣"><i class="fa-solid fa-xmark"></i></button>
+          <button class="action-btn super-like" title="超级喜欢"><i class="fa-solid fa-star"></i></button>
+          <button class="action-btn like" id="likeBtn" title="喜欢"><i class="fa-solid fa-heart"></i></button>
+          <button class="action-btn boost" title="曝光"><i class="fa-solid fa-bolt"></i></button>
+        </div>
+        <div class="match-tip">💡 提示：向右滑表示喜欢，向左滑表示不感兴趣</div>
+      </div>
+
+      <aside class="match-side">
+        <div class="panel">
+          <h4><i class="fa-solid fa-wand-magic-sparkles"></i> 今日已匹配 <span class="count-badge" id="matchCountBadge">(0)</span></h4>
+          <div class="match-list" id="matchListContainer">
+            <div class="empty-mini">还没有匹配的人哦</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h4><i class="fa-solid fa-gear"></i> 匹配偏好</h4>
+          <div class="pref-item"><label>性别偏好</label><div class="seg"><span class="seg-btn active">女生</span><span class="seg-btn">男生</span><span class="seg-btn">不限</span></div></div>
+          <div class="pref-item"><label>年龄范围</label><div class="slider-wrap"><input type="range" min="18" max="50" value="25" class="slider"><div class="range-label"><span>18</span><span>50</span></div></div></div>
+          <div class="pref-item"><label>距离范围</label><div class="slider-wrap"><input type="range" min="1" max="50" value="10" class="slider"><div class="range-label"><span>1km</span><span>10km</span><span>50km</span></div></div></div>
+          <div class="pref-item"><label>兴趣标签</label><div class="tag-picker"><span class="tag-pick active">音乐</span><span class="tag-pick active">游戏</span><span class="tag-pick">电影</span><span class="tag-pick">运动</span><span class="tag-pick">读书</span><span class="tag-pick active">旅行</span></div></div>
+        </div>
+
+        <div class="panel">
+          <h4><i class="fa-solid fa-gift"></i> 会员特权</h4>
+          <div class="vip-card">
+            <div class="vip-bg"></div>
+            <div class="vip-content">
+              <div class="vip-badge"><i class="fa-solid fa-crown"></i> VIP</div>
+              <h3>圈圈高级会员</h3>
+              <p>查看谁喜欢了你 · 无限喜欢次数 · 位置穿梭</p>
+              <button class="btn-primary tiny">立即开通</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ==================== 语音房间（TikTok/Kuaishou 风格） ==================== -->
+  <section class="view hidden voice-view" id="view-voice">
+    <div class="view-header">
+      <h1 class="view-title">语音房间</h1>
+      <p class="view-desc">实时语音互动 · 单人直播 · 多人聊天 · 小游戏</p>
+    </div>
+
+    <!-- 创建房间按钮 + 类型选择下拉 -->
+    <div class="create-room-bar">
+      <div class="room-type-toggle" id="roomTypeToggle">
+        <button class="room-type-btn active" data-type="single">
+          <i class="fa-solid fa-broadcast-tower"></i>
+          <span>单人直播间</span>
+          <small>主播模式</small>
+        </button>
+        <button class="room-type-btn" data-type="multi">
+          <i class="fa-solid fa-users"></i>
+          <span>多人语音房</span>
+          <small>听众模式</small>
+        </button>
+      </div>
+      <button class="btn-primary big create-room-btn" id="createRoomBtn">
+        <i class="fa-solid fa-plus"></i> 开启房间
+      </button>
+    </div>
+
+    <!-- 筛选 chips -->
+    <div class="voice-filter-chips">
+      <div class="vchip active" data-filter="all">全部</div>
+      <div class="vchip" data-filter="love">💕 情感</div>
+      <div class="vchip" data-filter="music">🎵 音乐</div>
+      <div class="vchip" data-filter="game">🎮 游戏</div>
+      <div class="vchip" data-filter="night">🌙 深夜聊天</div>
+    </div>
+
+    <!-- 房间卡片网格 -->
+    <div class="room-grid">
+
+      <!-- 热门单人直播 -->
+      <div class="room-card featured" data-room-type="single" data-room="1">
+        <div class="room-cover" style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);">
+          <div class="room-cover-decoration wave-audio">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span class="room-type-badge single">🎙️ 单人</span>
+          <div class="room-live-tag"><i class="fa-solid fa-circle"></i> LIVE</div>
+          <div class="room-listener-count"><i class="fa-solid fa-headphones"></i> 1,234</div>
+        </div>
+        <div class="room-card-body">
+          <div class="room-topic">深夜情感电台 · 聊心事 💔</div>
+          <div class="room-host-row">
+            <div class="room-host-avatar online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=anime%20boy%20hoodie%20dark%20aesthetic&image_size=square" alt=""></div>
+            <div class="room-host-info">
+              <div class="room-host-name">夜话先生</div>
+              <div class="room-host-sub">主播 · 开播 2h34m</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 多人游戏房 -->
+      <div class="room-card" data-room-type="multi" data-room="2">
+        <div class="room-cover" style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);">
+          <div class="room-cover-decoration controller">🎮</div>
+          <span class="room-type-badge multi">👥 多人</span>
+          <div class="room-listener-count"><i class="fa-solid fa-headphones"></i> 876</div>
+        </div>
+        <div class="room-card-body">
+          <div class="room-topic">LOL五黑 · 缺一个打野 🎮</div>
+          <div class="room-host-row">
+            <div class="room-host-avatar online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=gamer%20boy%20rgb%20room&image_size=square" alt=""></div>
+            <div class="room-host-info">
+              <div class="room-host-name">电竞老王</div>
+              <div class="room-host-sub">房主 · 多人聊天</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 单人唱歌 -->
+      <div class="room-card" data-room-type="single" data-room="3">
+        <div class="room-cover" style="background:linear-gradient(135deg,#fa709a 0%,#fee140 100%);">
+          <div class="room-cover-decoration notes">🎶</div>
+          <span class="room-type-badge single">🎙️ 单人</span>
+          <div class="room-live-tag"><i class="fa-solid fa-circle"></i> LIVE</div>
+          <div class="room-listener-count"><i class="fa-solid fa-headphones"></i> 542</div>
+        </div>
+        <div class="room-card-body">
+          <div class="room-topic">唱歌交友 · 点歌就唱 🎤</div>
+          <div class="room-host-row">
+            <div class="room-host-avatar online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=singer%20girl%20mic%20stage&image_size=square" alt=""></div>
+            <div class="room-host-info">
+              <div class="room-host-name">麦霸阿May</div>
+              <div class="room-host-sub">主播 · 开播 1h12m</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 多人读书会 -->
+      <div class="room-card" data-room-type="multi" data-room="4">
+        <div class="room-cover" style="background:linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%);">
+          <div class="room-cover-decoration book">📖</div>
+          <span class="room-type-badge multi">👥 多人</span>
+          <div class="room-listener-count"><i class="fa-solid fa-headphones"></i> 328</div>
+        </div>
+        <div class="room-card-body">
+          <div class="room-topic">读书会 · 今晚读《百年孤独》📖</div>
+          <div class="room-host-row">
+            <div class="room-host-avatar online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=reader%20girl%20library%20cozy&image_size=square" alt=""></div>
+            <div class="room-host-info">
+              <div class="room-host-name">读书人小月</div>
+              <div class="room-host-sub">房主 · 多人聊天</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 单人 ASMR -->
+      <div class="room-card" data-room-type="single" data-room="5">
+        <div class="room-cover" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);">
+          <div class="room-cover-decoration moon">🌙</div>
+          <span class="room-type-badge single">🎙️ 单人</span>
+          <div class="room-live-tag"><i class="fa-solid fa-circle"></i> LIVE</div>
+          <div class="room-listener-count"><i class="fa-solid fa-headphones"></i> 189</div>
+        </div>
+        <div class="room-card-body">
+          <div class="room-topic">ASMR助眠 · 温柔耳语 🌙</div>
+          <div class="room-host-row">
+            <div class="room-host-avatar online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=girl%20sleepy%20bedroom%20night&image_size=square" alt=""></div>
+            <div class="room-host-info">
+              <div class="room-host-name">绵绵</div>
+              <div class="room-host-sub">主播 · 开播 45m</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 多人美食分享 -->
+      <div class="room-card" data-room-type="multi" data-room="6">
+        <div class="room-cover" style="background:linear-gradient(135deg,#ffecd2 0%,#fcb69f 100%);">
+          <div class="room-cover-decoration ramen">🍜</div>
+          <span class="room-type-badge multi">👥 多人</span>
+          <div class="room-listener-count"><i class="fa-solid fa-headphones"></i> 267</div>
+        </div>
+        <div class="room-card-body">
+          <div class="room-topic">探店分享 · 成都美食地图 🍜</div>
+          <div class="room-host-row">
+            <div class="room-host-avatar online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=foodie%20boy%20happy%20restaurant&image_size=square" alt=""></div>
+            <div class="room-host-info">
+              <div class="room-host-name">好吃嘴</div>
+              <div class="room-host-sub">房主 · 多人聊天</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 深夜情感多人 -->
+      <div class="room-card" data-room-type="multi" data-room="7">
+        <div class="room-cover" style="background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);">
+          <div class="room-cover-decoration heart">💕</div>
+          <span class="room-type-badge multi">👥 多人</span>
+          <div class="room-listener-count"><i class="fa-solid fa-headphones"></i> 612</div>
+        </div>
+        <div class="room-card-body">
+          <div class="room-topic">今晚聊聊你的心动瞬间 ✨</div>
+          <div class="room-host-row">
+            <div class="room-host-avatar online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=soft%20girl%20night%20ambient&image_size=square" alt=""></div>
+            <div class="room-host-info">
+              <div class="room-host-name">糖糖酱</div>
+              <div class="room-host-sub">房主 · 多人聊天</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 单人音乐人直播 -->
+      <div class="room-card" data-room-type="single" data-room="8">
+        <div class="room-cover" style="background:linear-gradient(135deg,#232526 0%,#414345 100%);">
+          <div class="room-cover-decoration mic">🎤</div>
+          <span class="room-type-badge single">🎙️ 单人</span>
+          <div class="room-live-tag"><i class="fa-solid fa-circle"></i> LIVE</div>
+          <div class="room-listener-count"><i class="fa-solid fa-headphones"></i> 98</div>
+        </div>
+        <div class="room-card-body">
+          <div class="room-topic">独立音乐人 · 今晚弹吉他 🎸</div>
+          <div class="room-host-row">
+            <div class="room-host-avatar online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=independent%20musician%20guy%20guitar%20studio&image_size=square" alt=""></div>
+            <div class="room-host-info">
+              <div class="room-host-name">阿树</div>
+              <div class="room-host-sub">主播 · 开播 22m</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 圈圈频道 ==================== -->
+  <section class="view hidden" id="view-circle">
+    <div class="view-header">
+      <h1 class="view-title">圈圈频道</h1>
+      <p class="view-desc">兴趣社区 · 话题讨论 · 内容共创</p>
+    </div>
+
+    <div class="circle-layout">
+      <!-- ===== 左侧频道列表 ===== -->
+      <aside class="channel-sidebar">
+        <div class="sidebar-create-channel">
+          <button class="btn-primary full" id="circleCreateBtn"><i class="fa-solid fa-plus"></i> 创建新频道</button>
+        </div>
+
+        <div class="channel-list" id="channelListWrap">
+          <div class="channel-group">
+            <h5><i class="fa-regular fa-bookmark"></i> 我的频道</h5>
+            <div class="channel-item active" data-circle-id="1" data-circle-name="LOL英雄联盟" data-circle-icon="🎮">
+              <div class="channel-item-icon" style="background:linear-gradient(135deg,#ff9966,#ff5e62);">🎮</div>
+              <div class="channel-item-info">
+                <div class="channel-item-name">LOL英雄联盟</div>
+                <div class="channel-item-meta"><i class="fa-solid fa-users"></i> 128k</div>
+              </div>
+              <span class="channel-item-badge">3</span>
+            </div>
+            <div class="channel-item" data-circle-id="2" data-circle-name="独立音乐" data-circle-icon="🎵">
+              <div class="channel-item-icon" style="background:linear-gradient(135deg,#667eea,#764ba2);">🎵</div>
+              <div class="channel-item-info">
+                <div class="channel-item-name">独立音乐</div>
+                <div class="channel-item-meta"><i class="fa-solid fa-users"></i> 52k</div>
+              </div>
+            </div>
+            <div class="channel-item" data-circle-id="3" data-circle-name="二次元" data-circle-icon="🌸">
+              <div class="channel-item-icon" style="background:linear-gradient(135deg,#f093fb,#f5576c);">🌸</div>
+              <div class="channel-item-info">
+                <div class="channel-item-name">二次元</div>
+                <div class="channel-item-meta"><i class="fa-solid fa-users"></i> 89k</div>
+              </div>
+            </div>
+            <div class="channel-item" data-circle-id="4" data-circle-name="单身交友" data-circle-icon="💘">
+              <div class="channel-item-icon" style="background:linear-gradient(135deg,#ff758c,#ff7eb3);">💘</div>
+              <div class="channel-item-info">
+                <div class="channel-item-name">单身交友</div>
+                <div class="channel-item-meta"><i class="fa-solid fa-users"></i> 201k</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="channel-group">
+            <h5><i class="fa-solid fa-wand-magic-sparkles"></i> 推荐频道</h5>
+            <div class="channel-item" data-circle-id="5" data-circle-name="旅行攻略" data-circle-icon="✈️">
+              <div class="channel-item-icon" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">✈️</div>
+              <div class="channel-item-info">
+                <div class="channel-item-name">旅行攻略</div>
+                <div class="channel-item-meta"><i class="fa-solid fa-users"></i> 34k</div>
+              </div>
+            </div>
+            <div class="channel-item" data-circle-id="6" data-circle-name="美食探店" data-circle-icon="🍜">
+              <div class="channel-item-icon" style="background:linear-gradient(135deg,#fa709a,#fee140);">🍜</div>
+              <div class="channel-item-info">
+                <div class="channel-item-name">美食探店</div>
+                <div class="channel-item-meta"><i class="fa-solid fa-users"></i> 67k</div>
+              </div>
+            </div>
+            <div class="channel-item" data-circle-id="7" data-circle-name="读书分享" data-circle-icon="📚">
+              <div class="channel-item-icon" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb);">📚</div>
+              <div class="channel-item-info">
+                <div class="channel-item-name">读书分享</div>
+                <div class="channel-item-meta"><i class="fa-solid fa-users"></i> 22k</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ===== 主内容区 ===== -->
+      <div class="circle-main">
+        <!-- 当前频道 Banner -->
+        <div class="channel-banner" id="channelBanner">
+          <div class="ch-banner-bg" id="chBannerBg" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);"></div>
+          <div class="ch-banner-content">
+            <div class="ch-icon" id="chBannerIcon">🎮</div>
+            <div class="ch-info">
+              <h2 id="chBannerName">LOL英雄联盟圈</h2>
+              <p id="chBannerDesc">128,430 成员 · 今日 2,341 条新帖</p>
+              <div class="ch-actions">
+                <button class="btn-white" id="chJoinBtn"><i class="fa-solid fa-check"></i> 已加入</button>
+                <button class="btn-ghost"><i class="fa-solid fa-bell"></i> 通知</button>
+                <button class="btn-ghost"><i class="fa-solid fa-share"></i> 分享</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 发帖 Composer（Sticky） ===== -->
+        <div class="post-composer" id="postComposer">
+          <div class="composer-row">
+            <div class="composer-avatar">
+              <img id="composerAvatar" src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20anime%20girl%20avatar%20portrait%20minimal&image_size=square" alt="">
+            </div>
+            <div class="composer-body">
+              <textarea id="composerText" class="composer-textarea" rows="2" placeholder="分享你的想法..."></textarea>
+
+              <!-- 附件按钮行 -->
+              <div class="attach-btn-row">
+                <label class="attach-btn" title="选择图片（最多 9 张）">
+                  <i class="fa-regular fa-image"></i> 📷 图片
+                  <input type="file" id="composerImages" accept="image/*" multiple hidden>
+                </label>
+                <label class="attach-btn" title="选择视频">
+                  <i class="fa-solid fa-video"></i> 🎥 视频
+                  <input type="file" id="composerVideo" accept="video/*" hidden>
+                </label>
+                <button type="button" class="attach-btn" id="composerEmoji"><i class="fa-regular fa-face-smile"></i> 😊 表情</button>
+                <button type="button" class="attach-btn" id="composerLocation"><i class="fa-solid fa-location-dot"></i> 📍 位置</button>
+
+                <!-- 右侧：发帖类型 pills -->
+                <span class="composer-type-pills">
+                  <span class="post-type-pill active" data-type="text">📝 纯文字</span>
+                  <span class="post-type-pill" data-type="image">🖼️ 图文</span>
+                  <span class="post-type-pill" data-type="video">🎥 视频</span>
+                </span>
+              </div>
+
+              <!-- 表情面板（圈圈频道发帖用） -->
+              <div class="composer-emoji-panel" id="composerEmojiPanel">
+                <div class="emoji-cats">
+                  <span class="ecat active">😀</span><span class="ecat">❤️</span><span class="ecat">🎉</span>
+                  <span class="ecat">👍</span><span class="ecat">💯</span><span class="ecat">🎶</span>
+                  <span class="ecat">🍕</span><span class="ecat">🐱</span>
+                </div>
+                <div class="emoji-grid" id="composerEmojiGrid"></div>
+              </div>
+
+              <!-- 预览条（图片缩略图） -->
+              <div class="composer-preview-strip" id="composerPreviewStrip"></div>
+
+              <!-- 底部：发布按钮 + 字数计数 -->
+              <div class="composer-bottom">
+                <span class="char-counter" id="charCounter">0/500</span>
+                <button class="btn-primary composer-submit" id="composerSubmitBtn">
+                  <i class="fa-solid fa-paper-plane"></i> 发布
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Feed 切换 ===== -->
+        <div class="feed-tabs" id="feedTabs">
+          <span class="feed-tab active" data-feed="latest"><i class="fa-solid fa-fire"></i> 最新</span>
+          <span class="feed-tab" data-feed="hot"><i class="fa-solid fa-star"></i> 精华</span>
+          <span class="feed-tab" data-feed="calendar"><i class="fa-regular fa-calendar"></i> 日历视图</span>
+        </div>
+
+        <!-- ===== 帖子列表 ===== -->
+        <div class="feed-list" id="feedList">
+          <!-- 示例 Post 1（单图 + 文字） -->
+          <article class="post-card" data-post-id="1001">
+            <div class="post-author-row">
+              <div class="post-author-avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=gamer%20guy%20avatar&image_size=square" alt=""></div>
+              <div class="post-author-info">
+                <span class="post-author-name">电竞老王</span>
+                <span class="post-time">2 小时前</span>
+              </div>
+              <span class="post-channel-tag"># LOL英雄联盟</span>
+            </div>
+            <div class="post-content">
+              <div class="post-title">S14赛季最强上单英雄盘点，第一名居然是他？</div>
+              <p class="post-text">从青铜到王者版本答案，详细数据带分析，亲测有效！这赛季上单真的百花齐放，大家快冲！</p>
+            </div>
+            <div class="post-image-grid single">
+              <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=league%20of%20legends%20top%20lane%20champion%20s14%20season&image_size=landscape_16_9" alt="post">
+            </div>
+            <div class="post-stats-row">
+              <button class="stat-item"><i class="fa-regular fa-eye"></i> 12.8k</button>
+              <button class="stat-item"><i class="fa-regular fa-comment-dots"></i> 842</button>
+              <button class="stat-item"><i class="fa-regular fa-bookmark"></i> 321</button>
+              <button class="stat-item"><i class="fa-solid fa-share-nodes"></i> 56</button>
+            </div>
+            <div class="post-actions-row">
+              <button class="action-btn like-btn" data-like-count="1284"><i class="fa-regular fa-heart"></i> <span class="like-count">1284</span></button>
+              <button class="action-btn comment-btn"><i class="fa-regular fa-comment"></i> 评论</button>
+              <button class="action-btn share-btn"><i class="fa-solid fa-share-nodes"></i> 分享</button>
+            </div>
+          </article>
+
+          <!-- 示例 Post 2（多图 3 张） -->
+          <article class="post-card" data-post-id="1002">
+            <div class="post-author-row">
+              <div class="post-author-avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=anime%20girl%20pink%20hair&image_size=square" alt=""></div>
+              <div class="post-author-info">
+                <span class="post-author-name">南城以北</span>
+                <span class="post-time">5 小时前</span>
+              </div>
+              <span class="post-channel-tag"># LOL英雄联盟</span>
+            </div>
+            <div class="post-content">
+              <div class="post-title">打野节奏控制全解：什么时候该反野，什么时候该gank？</div>
+              <p class="post-text">分享一套我从白金冲到钻石的打野路线图～亲测有效，节奏太重要了！</p>
+            </div>
+            <div class="post-image-grid">
+              <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=jungle%20route%20guide%20minimap%20lol&image_size=square" alt="">
+              <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=lvl%203%20invade%20jungle%20strategy&image_size=square" alt="">
+              <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=gank%20timing%20chart%20league&image_size=square" alt="">
+            </div>
+            <div class="post-stats-row">
+              <button class="stat-item"><i class="fa-regular fa-eye"></i> 4.2k</button>
+              <button class="stat-item"><i class="fa-regular fa-comment-dots"></i> 312</button>
+              <button class="stat-item"><i class="fa-regular fa-bookmark"></i> 189</button>
+              <button class="stat-item"><i class="fa-solid fa-share-nodes"></i> 23</button>
+            </div>
+            <div class="post-actions-row">
+              <button class="action-btn like-btn" data-like-count="567"><i class="fa-regular fa-heart"></i> <span class="like-count">567</span></button>
+              <button class="action-btn comment-btn"><i class="fa-regular fa-comment"></i> 评论</button>
+              <button class="action-btn share-btn"><i class="fa-solid fa-share-nodes"></i> 分享</button>
+            </div>
+          </article>
+
+          <!-- 示例 Post 3（视频） -->
+          <article class="post-card" data-post-id="1003">
+            <div class="post-author-row">
+              <div class="post-author-avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=handsome%20guy%20minimalist%20portrait&image_size=square" alt=""></div>
+              <div class="post-author-info">
+                <span class="post-author-name">夜话先生</span>
+                <span class="post-time">1 天前</span>
+              </div>
+              <span class="post-channel-tag"># LOL英雄联盟</span>
+            </div>
+            <div class="post-content">
+              <div class="post-title">【网通一区】战队招募！钻石以上进</div>
+              <p class="post-text">固定五黑队，目标冲击大师，有语音房每晚 8 点开黑。发了一段平时开黑的精彩集锦，大家看看水平～</p>
+            </div>
+            <div class="post-video-wrap">
+              <img class="post-video-thumb" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=esports%20team%20gaming%20setup%20rgb&image_size=landscape_16_9" alt="video">
+              <div class="play-overlay"><i class="fa-solid fa-play"></i></div>
+              <span class="video-duration">03:48</span>
+            </div>
+            <div class="post-stats-row">
+              <button class="stat-item"><i class="fa-regular fa-eye"></i> 892</button>
+              <button class="stat-item"><i class="fa-regular fa-comment-dots"></i> 74</button>
+              <button class="stat-item"><i class="fa-regular fa-bookmark"></i> 42</button>
+              <button class="stat-item"><i class="fa-solid fa-share-nodes"></i> 8</button>
+            </div>
+            <div class="post-actions-row">
+              <button class="action-btn like-btn" data-like-count="98"><i class="fa-regular fa-heart"></i> <span class="like-count">98</span></button>
+              <button class="action-btn comment-btn"><i class="fa-regular fa-comment"></i> 评论</button>
+              <button class="action-btn share-btn"><i class="fa-solid fa-share-nodes"></i> 分享</button>
+            </div>
+          </article>
+
+          <!-- 示例 Post 4（纯文字） -->
+          <article class="post-card" data-post-id="1004">
+            <div class="post-author-row">
+              <div class="post-author-avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt=""></div>
+              <div class="post-author-info">
+                <span class="post-author-name">糖糖酱</span>
+                <span class="post-time">刚刚</span>
+              </div>
+              <span class="post-channel-tag"># LOL英雄联盟</span>
+            </div>
+            <div class="post-content">
+              <p class="post-text">有没有今晚一起开黑的小伙伴呀～ 我玩辅助很稳的 🥺 黄金段位，不要嫌弃！</p>
+            </div>
+            <div class="post-stats-row">
+              <button class="stat-item"><i class="fa-regular fa-eye"></i> 234</button>
+              <button class="stat-item"><i class="fa-regular fa-comment-dots"></i> 18</button>
+              <button class="stat-item"><i class="fa-regular fa-bookmark"></i> 2</button>
+              <button class="stat-item"><i class="fa-solid fa-share-nodes"></i> 1</button>
+            </div>
+            <div class="post-actions-row">
+              <button class="action-btn like-btn" data-like-count="34"><i class="fa-regular fa-heart"></i> <span class="like-count">34</span></button>
+              <button class="action-btn comment-btn"><i class="fa-regular fa-comment"></i> 评论</button>
+              <button class="action-btn share-btn"><i class="fa-solid fa-share-nodes"></i> 分享</button>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- ===== 右侧热门话题（桌面端可选） ===== -->
+      <aside class="circle-rank">
+        <div class="panel">
+          <h4><i class="fa-solid fa-fire"></i> 热门话题</h4>
+          <div class="hot-topic-item"><span class="ht-rank hot">1</span><span class="ht-name">#S14赛季版本答案</span><span class="ht-count">🔥 12.8w</span></div>
+          <div class="hot-topic-item"><span class="ht-rank">2</span><span class="ht-name">#今晚一起开黑</span><span class="ht-count">4.2w</span></div>
+          <div class="hot-topic-item"><span class="ht-rank">3</span><span class="ht-name">#钻石冲刺攻略</span><span class="ht-count">3.1w</span></div>
+          <div class="hot-topic-item"><span class="ht-rank">4</span><span class="ht-name">#新英雄体验</span><span class="ht-count">2.5w</span></div>
+          <div class="hot-topic-item"><span class="ht-rank">5</span><span class="ht-name">#战队招募</span><span class="ht-count">892</span></div>
+        </div>
+        <div class="panel">
+          <h4><i class="fa-solid fa-trophy"></i> 本周活跃榜</h4>
+          <div class="rank-item"><span class="rk-num gold">1</span><span class="rk-name">电竞老王</span><span class="rk-score">2,847</span></div>
+          <div class="rank-item"><span class="rk-num silver">2</span><span class="rk-name">夜话先生</span><span class="rk-score">2,341</span></div>
+          <div class="rank-item"><span class="rk-num bronze">3</span><span class="rk-name">南城以北</span><span class="rk-score">1,982</span></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ==================== 消息中心 ==================== -->
+  <section class="view hidden" id="view-chat">
+    <div class="view-header">
+      <h1 class="view-title">消息中心</h1>
+      <p class="view-desc">一对一聊天 · 群聊 · 语音视频通话</p>
+    </div>
+
+    <div class="chat-layout">
+      <div class="chat-list" id="chatList">
+        <div class="chat-list-head">
+          <span>会话列表</span>
+          <button type="button" class="chat-list-close" id="chatListClose" title="返回聊天"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="chat-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="搜索聊天..."></div>
+        <div class="chat-list-body">
+          <div class="chat-item active"><div class="avatar ring-online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt=""></div><div class="chat-info"><div class="chat-name">糖糖酱 <span class="badge-dot"></span></div><div class="chat-preview">好呀好呀！那我们今晚8点在语音房见～</div></div><div class="chat-meta"><span class="chat-time">刚刚</span><span class="chat-unread">2</span></div></div>
+          <div class="chat-item"><div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=handsome%20guy%20minimalist%20portrait&image_size=square" alt=""></div><div class="chat-info"><div class="chat-name">清风明月</div><div class="chat-preview">哈哈哈哈哈你也太菜了吧</div></div><div class="chat-meta"><span class="chat-time">5分钟前</span></div></div>
+          <div class="chat-item group"><div class="avatar group-ava"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=gamer%20boy%20rgb%20room&image_size=square" alt=""><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=girl%20gamer%20pink%20setup&image_size=square" alt=""></div><div class="chat-info"><div class="chat-name">LOL开黑五人组</div><div class="chat-preview">电竞老王：今晚谁先上号？</div></div><div class="chat-meta"><span class="chat-time">1小时前</span><span class="chat-unread">5</span></div></div>
+          <div class="chat-item"><div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=girl%20artist%20painting&image_size=square" alt=""></div><div class="chat-info"><div class="chat-name">画画的阿猫</div><div class="chat-preview">[图片]</div></div><div class="chat-meta"><span class="chat-time">昨天</span></div></div>
+          <div class="chat-item system"><div class="avatar sys"><i class="fa-solid fa-bell"></i></div><div class="chat-info"><div class="chat-name">系统通知</div><div class="chat-preview">你和 糖糖酱 互相喜欢啦！</div></div><div class="chat-meta"><span class="chat-time">昨天</span></div></div>
+        </div>
+      </div>
+
+      <div class="chat-main">
+        <div class="chat-head">
+          <button type="button" class="chat-list-toggle" id="chatListToggle" title="会话列表">
+            <i class="fa-solid fa-comment-dots"></i>
+            <span class="chat-list-badge hidden" id="chatListBadge"></span>
+          </button>
+          <div class="chat-user-info"><div class="avatar ring-online"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt=""></div><div class="chat-user-text"><div class="chat-user-name">糖糖酱</div><div class="chat-user-sub">在线 · 最后活跃 刚刚</div></div></div>
+          <div class="chat-head-actions">
+            <button title="语音通话" data-action="call" data-call-type="voice"><i class="fa-solid fa-phone"></i></button>
+            <button title="视频通话" data-action="call" data-call-type="video"><i class="fa-solid fa-video"></i></button>
+            <button title="更多"><i class="fa-solid fa-ellipsis"></i></button>
+          </div>
+        </div>
+
+        <div class="chat-body" id="chatBody">
+          <div class="chat-date">今天 14:30</div>
+          <div class="msg received"><div class="avatar-sm"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt=""></div><div class="msg-content"><p>嘿！你也喜欢看恐怖片吗 😱</p><span class="msg-time">14:30</span></div></div>
+          <div class="msg sent"><div class="msg-content"><p>哈哈对啊！最近刚看完《咒怨》，吓尿了都</p><span class="msg-time">14:32 · 已读</span></div></div>
+          <div class="msg received"><div class="avatar-sm"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt=""></div><div class="msg-content"><p>哇！那我们可以连麦看呀！</p><span class="msg-time">14:33</span></div></div>
+          <div class="msg sent"><div class="msg-content"><p>好呀好呀！那我们今晚8点在语音房见～</p><span class="msg-time">刚刚 · 已读</span></div></div>
+          <div class="msg voice received"><div class="avatar-sm"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt=""></div><div class="msg-content voice"><button class="play-voice"><i class="fa-solid fa-play"></i></button><div class="voice-waveform"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><span class="voice-duration">0:08</span></div></div>
+        </div>
+
+        <div class="emoji-panel" id="emojiPanel">
+          <div class="emoji-cats"><span class="ecat active">😀</span><span class="ecat">❤️</span><span class="ecat">🎉</span><span class="ecat">👍</span><span class="ecat">💯</span><span class="ecat">🎶</span><span class="ecat">🍕</span><span class="ecat">🐱</span></div>
+          <div class="emoji-grid" id="emojiGrid">
+            <!-- JS 填充 -->
+          </div>
+        </div>
+
+        <div class="chat-input-bar">
+          <button class="attach-btn" title="发送图片/视频"><i class="fa-solid fa-plus"></i></button>
+          <input type="file" id="chatMediaInput" accept="image/*,video/*" multiple hidden>
+          <div class="record-btn-wrap" id="recordWrap" style="display:none">
+            <button class="record-btn" id="cancelRecord"><i class="fa-solid fa-xmark"></i></button>
+            <button class="record-btn recording" id="stopRecord"><i class="fa-solid fa-microphone"></i><span>松开发送</span></button>
+            <button class="record-btn" id="slideCancel"><span><i class="fa-solid fa-trash"></i> 滑到取消</span></button>
+          </div>
+          <input type="text" class="chat-input-field" id="chatInput" placeholder="输入消息，Enter 发送...">
+          <button class="emoji-btn" id="emojiBtn"><i class="fa-regular fa-face-smile"></i></button>
+          <button class="voice-btn" id="voiceToggleBtn"><i class="fa-solid fa-microphone"></i></button>
+          <button class="send-btn" id="chatSendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 个人主页 ==================== -->
+  <section class="view hidden" id="view-profile">
+    <!-- 顶部 Banner -->
+    <div class="profile-hero">
+      <div class="profile-banner">
+        <div class="banner-gradient"></div>
+        <div class="banner-pattern-overlay"></div>
+        <button class="banner-edit-btn" title="更换封面"><i class="fa-solid fa-camera"></i></button>
+      </div>
+
+      <!-- Hero 信息区 -->
+      <div class="profile-hero-content">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20anime%20girl%20avatar%20portrait%20minimal&image_size=square" alt="头像">
+            <button class="edit-avatar"><i class="fa-solid fa-camera"></i></button>
+          </div>
+        </div>
+
+        <div class="profile-info-block">
+          <div class="profile-name-row">
+            <h1 class="profile-name">星野银河</h1>
+            <span class="verify-badge verified"><i class="fa-solid fa-circle-check"></i> 已实名认证</span>
+            <span class="tag-sm pink">ID: 10023586</span>
+          </div>
+          <div class="profile-bio">✨ 热爱音乐 · 喜欢二次元 · 深夜电台常驻主播 · 愿每一个深夜都有我陪伴你</div>
+          <div class="profile-meta-row">
+            <span class="meta-item"><i class="fa-solid fa-location-dot"></i> 上海 · 浦东新区</span>
+            <span class="meta-item"><i class="fa-solid fa-calendar"></i> 加入于 2024.03</span>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="profile-actions-bar">
+            <button class="edit-profile-btn" onclick="openEditProfileModal()">
+              <i class="fa-solid fa-pen"></i> 编辑资料
+            </button>
+            <button class="share-btn"><i class="fa-solid fa-share-nodes"></i> 分享主页</button>
+            <button class="wallet-btn" onclick="openModal('walletModal'); loadWallet?.()">
+              <i class="fa-solid fa-wallet"></i> 我的钱包
+            </button>
+            <button class="verify-status-btn" id="profileRealnameBtn" onclick="openRealnameModal()">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span class="verify-btn-text">去实名认证</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 统计数据行 -->
+    <div class="profile-stats-bar">
+      <div class="stat-item" onclick="navigateTo('followings')">
+        <span class="stat-value">128</span>
+        <span class="stat-label">关注</span>
+      </div>
+      <div class="stat-item" onclick="navigateTo('followers')">
+        <span class="stat-value highlight">2,341</span>
+        <span class="stat-label">粉丝</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">8.6k</span>
+        <span class="stat-label"><i class="fa-solid fa-heart" style="color:#ff2d55"></i> 获赞</span>
+      </div>
+      <div class="stat-item coins-display" onclick="document.getElementById('modal-wallet').classList.remove('hidden')">
+        <span class="stat-value coin-color">6,580</span>
+        <span class="stat-label"><i class="fa-solid fa-coins"></i> 金币</span>
+      </div>
+      <div class="stat-item diamonds-display" onclick="document.getElementById('modal-wallet').classList.remove('hidden')">
+        <span class="stat-value diamond-color">1,248</span>
+        <span class="stat-label"><i class="fa-regular fa-gem"></i> 钻石</span>
+      </div>
+    </div>
+
+    <!-- 内容 Tab 切换 -->
+    <div class="profile-tabs">
+      <div class="profile-tabs-inner">
+        <span class="profile-tab active" data-ptab="posts">动态</span>
+        <span class="profile-tab" data-ptab="favorites">收藏</span>
+        <span class="profile-tab" data-ptab="gifts">礼物</span>
+        <span class="profile-tab" data-ptab="orders">订单</span>
+      </div>
+      <div class="profile-tabs-indicator"></div>
+    </div>
+
+    <!-- Tab 内容区 -->
+    <div class="profile-content-area">
+      <!-- 动态 Posts Tab -->
+      <div class="ptab-panel active" data-ptab-panel="posts">
+        <div class="feed-column">
+          <article class="post-card">
+            <div class="post-header"><div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20anime%20girl%20avatar%20portrait%20minimal&image_size=square" alt=""></div><div class="post-meta"><div class="post-author">星野银河</div><div class="post-sub">2小时前 · 来自 iPhone</div></div><button class="post-more"><i class="fa-solid fa-ellipsis"></i></button></div>
+            <p class="post-text">今晚的深夜电台有人来吗？准备了好多故事想讲给大家听 🌙✨ 11点准时开播，不见不散~</p>
+            <div class="post-tags">#深夜电台 #情感 #失眠</div>
+            <div class="post-actions"><button><i class="fa-regular fa-heart"></i> 234</button><button><i class="fa-regular fa-comment"></i> 56</button><button><i class="fa-regular fa-bookmark"></i> 收藏</button><button class="enter-room"><i class="fa-solid fa-microphone"></i> 进入语音房</button></div>
+          </article>
+
+          <article class="post-card">
+            <div class="post-header"><div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20anime%20girl%20avatar%20portrait%20minimal&image_size=square" alt=""></div><div class="post-meta"><div class="post-author">星野银河</div><div class="post-sub">昨天 · 18:42</div></div><button class="post-more"><i class="fa-solid fa-ellipsis"></i></button></div>
+            <p class="post-text">新写了一首歌Demo，欢迎来听听看！🎧 希望大家会喜欢~</p>
+            <div class="post-media audio"><div class="audio-player"><button class="play-btn"><i class="fa-solid fa-play"></i></button><div class="waveform"><span style="height:30%"></span><span style="height:60%"></span><span style="height:45%"></span><span style="height:80%"></span><span style="height:55%"></span><span style="height:90%"></span><span style="height:40%"></span><span style="height:70%"></span><span style="height:50%"></span></div><span class="time">01:24</span></div></div>
+            <div class="post-actions"><button><i class="fa-regular fa-heart"></i> 1.2k</button><button><i class="fa-regular fa-comment"></i> 189</button><button><i class="fa-regular fa-share-from-square"></i> 分享</button></div>
+          </article>
+
+          <article class="post-card">
+            <div class="post-header"><div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20anime%20girl%20avatar%20portrait%20minimal&image_size=square" alt=""></div><div class="post-meta"><div class="post-author">星野银河</div><div class="post-sub">3天前</div></div><button class="post-more"><i class="fa-solid fa-ellipsis"></i></button></div>
+            <p class="post-text">感谢粉丝宝宝们的支持！粉丝突破 2000 啦！🎉 抽三位宝宝送钻石大礼包~</p>
+            <div class="post-actions"><button><i class="fa-regular fa-heart"></i> 856</button><button><i class="fa-regular fa-comment"></i> 312</button><button><i class="fa-solid fa-gift"></i> 128</button></div>
+          </article>
+        </div>
+      </div>
+
+      <!-- 收藏 Favorites Tab -->
+      <div class="ptab-panel" data-ptab-panel="favorites">
+        <div class="fav-grid">
+          <div class="fav-card"><div class="fav-emoji">🎵</div><div class="fav-title">我的歌单</div><div class="fav-count">24 首</div></div>
+          <div class="fav-card"><div class="fav-emoji">🎙️</div><div class="fav-title">收藏的电台</div><div class="fav-count">16 个</div></div>
+          <div class="fav-card"><div class="fav-emoji">💬</div><div class="fav-title">常用语录</div><div class="fav-count">42 条</div></div>
+          <div class="fav-card"><div class="fav-emoji">🔗</div><div class="fav-title">分享链接</div><div class="fav-count">8 个</div></div>
+        </div>
+      </div>
+
+      <!-- 礼物 Gifts Tab -->
+      <div class="ptab-panel" data-ptab-panel="gifts">
+        <div class="gift-summary-row">
+          <div class="gift-stat big"><span class="gift-emoji">💎</span><strong>5,678</strong><span>收到钻石</span></div>
+          <div class="gift-stat big"><span class="gift-emoji">🎁</span><strong>234</strong><span>收到礼物</span></div>
+          <div class="gift-stat big"><span class="gift-emoji">🚀</span><strong>56</strong><span>大礼物</span></div>
+        </div>
+        <div class="gift-timeline">
+          <div class="gift-msg-item"><div class="gift-ico-big">💎</div><div class="gift-info"><strong>温柔宇宙</strong> 送了 <span class="gift-name">钻石火箭</span><span class="gift-ts">2小时前</span></div><div class="gift-val">+680 💎</div></div>
+          <div class="gift-msg-item"><div class="gift-ico-big">💝</div><div class="gift-info"><strong>月光猎手</strong> 送了 <span class="gift-name">爱心暴击 ×99</span><span class="gift-ts">5小时前</span></div><div class="gift-val">+198 💎</div></div>
+          <div class="gift-msg-item"><div class="gift-ico-big">👑</div><div class="gift-info"><strong>神秘大佬</strong> 送了 <span class="gift-name">黄金皇冠</span><span class="gift-ts">昨天</span></div><div class="gift-val">+1,280 💎</div></div>
+        </div>
+      </div>
+
+      <!-- 订单 Orders Tab -->
+      <div class="ptab-panel" data-ptab-panel="orders">
+        <div class="order-summary-bar">
+          <div class="order-tab active">全部订单</div>
+          <div class="order-tab">充值记录</div>
+          <div class="order-tab">消费记录</div>
+          <div class="order-tab">开票中心</div>
+        </div>
+        <div class="order-list">
+          <div class="order-card"><div class="order-ico">💎</div><div class="order-info"><div class="order-title">钻石充值 ¥128</div><div class="order-sub">订单号 #20261112001 · 已完成</div></div><div class="order-status success">成功</div></div>
+          <div class="order-card"><div class="order-ico">🎁</div><div class="order-info"><div class="order-title">送出礼物 · 钻石火箭 ×2</div><div class="order-sub">订单号 #20261111088 · 已完成</div></div><div class="order-status success">已送达</div></div>
+          <div class="order-card"><div class="order-ico">💎</div><div class="order-info"><div class="order-title">钻石充值 ¥68</div><div class="order-sub">订单号 #20261109045 · 已完成</div></div><div class="order-status success">成功</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 编辑资料 Modal ============ -->
+  <div class="modal-overlay hidden" id="modal-edit-profile">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-to-square"></i> 编辑资料</h3>
+        <button class="modal-close" onclick="closeModal('modal-edit-profile')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="edit-avatar-section">
+          <div class="edit-avatar-preview" onclick="editAvatar()">
+            <img id="editAvatarImg" src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20anime%20girl%20avatar%20portrait%20minimal&image_size=square" alt="">
+            <div class="avatar-change-hint"><i class="fa-solid fa-camera"></i> 点击更换</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>昵称</label>
+          <input type="text" id="editNickname" value="" maxlength="20" placeholder="请输入昵称">
+        </div>
+        <div class="form-group">
+          <label>简介</label>
+          <textarea rows="3" id="editBio" maxlength="120" placeholder="介绍一下自己"></textarea>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>性别</label>
+            <select id="editGender"><option value="保密">保密</option><option value="女">女</option><option value="男">男</option></select>
+          </div>
+          <div class="form-group">
+            <label>年龄</label>
+            <input type="number" id="editAge" value="" min="18" max="100" placeholder="18">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>所在地</label>
+          <input type="text" id="editLocation" value="" maxlength="80" placeholder="例如：上海 · 浦东新区">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closeModal('modal-edit-profile')">取消</button>
+        <button class="btn-primary gradient-btn" id="editProfileSaveBtn" onclick="saveProfileModal()">保存修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 实名认证 Modal（动态切换 未提交/已提交/已通过） ============ -->
+  <div class="modal-overlay hidden" id="modal-verify">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-shield-halved"></i> 实名认证</h3>
+        <button class="modal-close" onclick="closeModal('verify')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+
+        <!-- 已认证状态卡片 -->
+        <div class="verify-status-card verified" id="verifyVerifiedState" style="display:none">
+          <div class="verify-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="verify-info">
+            <div class="verify-title">已完成实名认证</div>
+            <div class="verify-sub">认证时间：<span id="verifyVerifiedAt">—</span> · 受法律保护</div>
+          </div>
+        </div>
+
+        <!-- 审核中状态 -->
+        <div class="verify-status-card pending" id="verifyPendingState" style="display:none">
+          <div class="verify-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div class="verify-info">
+            <div class="verify-title">实名认证审核中</div>
+            <div class="verify-sub">请耐心等待，通常 1-3 个工作日</div>
+          </div>
+        </div>
+
+        <!-- 未提交：表单 -->
+        <div id="verifyFormState">
+          <p class="verify-form-hint">为保护你的安全，送礼、购物、开播、匹配都需要实名认证。信息加密存储，绝不外泄。</p>
+          <div class="form-group">
+            <label>真实姓名</label>
+            <input type="text" id="verifyRealName" placeholder="请输入真实姓名" required>
+          </div>
+          <div class="form-group">
+            <label>身份证号</label>
+            <input type="text" id="verifyIdCard" placeholder="请输入 18 位身份证号码" maxlength="18" required>
+          </div>
+          <div class="form-group">
+            <label>绑定手机号</label>
+            <input type="tel" id="verifyPhone" placeholder="请输入手机号" maxlength="11">
+          </div>
+          <div class="form-group">
+            <label>人脸验证照片</label>
+            <div class="face-upload-area" id="faceUploadArea">
+              <input type="file" id="verifyFaceFile" accept="image/*" hidden>
+              <div class="face-preview"><i class="fa-solid fa-user-plus"></i><span>点击上传人脸照</span></div>
+              <div class="face-tip">请确保照片清晰、光线充足，人脸正对镜头</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closeModal('verify')">关闭</button>
+        <button class="btn-primary gradient-btn" id="verifySubmitBtn" onclick="submitRealname()">提交认证</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 钱包 Modal ============ -->
+  <div class="modal-overlay hidden" id="modal-wallet">
+    <div class="modal-card wallet-modal">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-wallet"></i> 我的钱包</h3>
+        <button class="modal-close" onclick="document.getElementById('modal-wallet').classList.add('hidden')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <!-- 余额卡片 -->
+        <div class="wallet-balance-row">
+          <div class="balance-card coins-display">
+            <div class="balance-label"><i class="fa-solid fa-coins"></i> 金币余额</div>
+            <div class="balance-value coin-color">6,580</div>
+            <div class="balance-hint">1 元 = 10 金币</div>
+          </div>
+          <div class="balance-card diamonds-display">
+            <div class="balance-label"><i class="fa-regular fa-gem"></i> 钻石余额</div>
+            <div class="balance-value diamond-color">1,248</div>
+            <div class="balance-hint">钻石可用于送礼</div>
+          </div>
+        </div>
+
+        <!-- 免费钻石任务 -->
+        <div class="earn-hint-card">
+          <div class="earn-hint-icon">🎁</div>
+          <div class="earn-hint-body">
+            <strong>免费领钻石</strong>
+            <span>每日签到、分享、邀请好友均可获得免费钻石</span>
+          </div>
+          <button class="earn-hint-btn">去赚 <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
+        <!-- 充值套餐 -->
+        <div class="recharge-section">
+          <div class="recharge-title"><i class="fa-solid fa-bolt"></i> 快速充值</div>
+          <div class="recharge-grid">
+            <div class="recharge-pack" data-amount="6">
+              <div class="pack-price">¥6</div>
+              <div class="pack-give">60 金币</div>
+            </div>
+            <div class="recharge-pack" data-amount="30">
+              <div class="pack-price">¥30</div>
+              <div class="pack-give">300 金币</div>
+            </div>
+            <div class="recharge-pack" data-amount="68">
+              <div class="pack-price">¥68</div>
+              <div class="pack-give">680 金币</div>
+              <div class="pack-tag">+赠送 68</div>
+            </div>
+            <div class="recharge-pack" data-amount="128">
+              <div class="pack-price">¥128</div>
+              <div class="pack-give">1,280 金币</div>
+              <div class="pack-tag hot">🔥 热销</div>
+            </div>
+            <div class="recharge-pack" data-amount="328">
+              <div class="pack-price">¥328</div>
+              <div class="pack-give">3,280 金币</div>
+              <div class="pack-tag">+赠送 328</div>
+            </div>
+            <div class="recharge-pack" data-amount="648">
+              <div class="pack-price">¥648</div>
+              <div class="pack-give">6,480 金币</div>
+              <div class="pack-tag">+赠送 888</div>
+            </div>
+            <div class="recharge-pack featured" data-amount="1298">
+              <div class="pack-price">¥1,298</div>
+              <div class="pack-give">12,980 金币</div>
+              <div class="pack-tag best">💎 尊享</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="pay-methods">
+          <span class="pay-label">支付方式：</span>
+          <button class="pay-method active"><i class="fa-brands fa-weixin" style="color:#07c160"></i> 微信</button>
+          <button class="pay-method"><i class="fa-brands fa-alipay" style="color:#1677ff"></i> 支付宝</button>
+        </div>
+        <button class="btn-primary gradient-btn full-width" style="margin-top:12px">立即充值</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 好感度 ============ -->
+  <section class="view hidden" id="view-favorites">
+    <div class="view-header"><h2 class="view-title"><i class="fa-solid fa-fire" style="color:#f97316"></i> 好感度榜</h2><p class="view-desc">送礼、聊天、通话都能增加双方好感度</p></div>
+
+    <div class="fav-summary">
+      <div class="fav-stat"><i class="fa-solid fa-ring"></i><div class="fs-inner"><strong id="favRelCount">0</strong><span>已建立关系</span></div></div>
+      <div class="fav-stat"><i class="fa-solid fa-hand-holding-heart"></i><div class="fs-inner"><strong id="favGiftsCount">0</strong><span>送出礼物</span></div></div>
+      <div class="fav-stat"><i class="fa-solid fa-user-group"></i><div class="fs-inner"><strong id="favChatDays">0</strong><span>亲密好友</span></div></div>
+    </div>
+
+    <div class="fav-filter"><span class="label">筛选:</span>
+      <button class="tab active" data-fav-tab="all">全部</button>
+      <button class="tab" data-fav-tab="friends">好友</button>
+      <button class="tab" data-fav-tab="matched">已匹配</button>
+      <button class="tab" data-fav-tab="top">Top</button>
+    </div>
+
+    <div class="fav-list" id="favList"></div>
+  </section>
+
+  <!-- ============ 我的关系 ============ -->
+  <section class="view hidden" id="view-relationships">
+    <div class="view-header"><h2 class="view-title"><i class="fa-solid fa-ring" style="color:#ec4899"></i> 我的关系</h2><p class="view-desc">双方好感度达标即可自动绑定对应关系；也可主动申请</p></div>
+
+    <div class="rel-types-card">
+      <h4><i class="fa-solid fa-shield-heart"></i> 关系等级</h4>
+      <div class="rel-type-grid" id="relTypeGrid"></div>
+    </div>
+
+    <div class="rel-section"><h3><i class="fa-solid fa-heart"></i> 已建立关系</h3><div class="rel-list" id="relList"></div></div>
+
+    <div class="rel-section"><h3><i class="fa-solid fa-hourglass-half"></i> 即将解锁</h3><div class="rel-pending" id="relPending"></div></div>
+  </section>
+
+  <!-- ==================== 商城中心 —— 独立 View ==================== -->
+  <section class="view hidden" id="view-shop">
+    <div class="view-header">
+      <h1 class="view-title"><i class="fa-solid fa-store" style="color:#ff2d55"></i> 商城中心</h1>
+      <p class="view-desc">甄选好物 · 品质生活 · 新人专享立减</p>
+    </div>
+
+    <!-- 分类导航 -->
+    <div class="shop-cat-tabs">
+      <button class="shop-cat-tab active" data-shop-cat="3c"><i class="fa-solid fa-laptop"></i> 3C数码</button>
+      <button class="shop-cat-tab" data-shop-cat="beauty"><i class="fa-solid fa-sparkles"></i> 美妆护肤</button>
+      <button class="shop-cat-tab" data-shop-cat="fashion"><i class="fa-solid fa-shirt"></i> 服饰鞋包</button>
+      <button class="shop-cat-tab" data-shop-cat="food"><i class="fa-solid fa-bowl-food"></i> 食品生鲜</button>
+      <button class="shop-cat-tab" data-shop-cat="home"><i class="fa-solid fa-couch"></i> 家居生活</button>
+      <button class="shop-cat-tab" data-shop-cat="virtual"><i class="fa-solid fa-gamepad"></i> 虚拟道具</button>
+    </div>
+
+    <!-- 精选 Banner -->
+    <div class="shop-banner">
+      <div class="shop-banner-card" style="--bg1:#f093fb;--bg2:#f5576c">
+        <div class="sbc-emoji">🎧</div>
+        <div class="sbc-info">
+          <span class="sbc-tag">新人专享</span>
+          <h4>蓝牙耳机 低至 5 折</h4>
+          <p>限时 24 小时 · 享 7 天无理由退换</p>
+          <button class="sbc-btn">立即抢购 →</button>
+        </div>
+      </div>
+      <div class="shop-banner-card" style="--bg1:#4facfe;--bg2:#00f2fe">
+        <div class="sbc-emoji">📱</div>
+        <div class="sbc-info">
+          <span class="sbc-tag">爆款热卖</span>
+          <h4>智能手机 分期免息</h4>
+          <p>12 期免息 · 以旧换新最高补贴 ¥2000</p>
+          <button class="sbc-btn">查看详情 →</button>
+        </div>
+      </div>
+      <div class="shop-banner-card" style="--bg1:#fa709a;--bg2:#fee140">
+        <div class="sbc-emoji">🍜</div>
+        <div class="sbc-info">
+          <span class="sbc-tag">产地直供</span>
+          <h4>生鲜水果 满 99 减 30</h4>
+          <p>顺丰冷链 · 次日达 · 坏果包赔</p>
+          <button class="sbc-btn">去选购 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 商品网格 -->
+    <div class="shop-view">
+      <div class="shop-grid-head">
+        <h3><i class="fa-solid fa-fire"></i> 为你推荐</h3>
+        <div class="shop-sort">
+          <button class="ssort active">综合</button>
+          <button class="ssort">销量</button>
+          <button class="ssort">价格 ↑</button>
+          <button class="ssort">价格 ↓</button>
+        </div>
+      </div>
+
+      <div class="product-grid">
+        <!-- 商品卡 1 -->
+        <div class="product-card" data-product='{"name":"主动降噪蓝牙耳机","price":399,"origin":799,"emoji":"🎧","bg":"linear-gradient(135deg,#f093fb 0%,#f5576c 100%)","place":"深圳","sales":12834}'>
+          <div class="product-img" style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%)">🎧</div>
+          <div class="product-info">
+            <div class="product-name">主动降噪蓝牙耳机 无线运动游戏低延迟 HiFi 音质</div>
+            <div class="product-meta"><span class="place">广东深圳</span><span class="sales">已售 1.2w+</span></div>
+            <div class="product-price-row">
+              <span class="product-price">¥399</span>
+              <span class="product-origin">¥799</span>
+            </div>
+            <button class="product-buy" data-action="open-detail"><i class="fa-solid fa-cart-plus"></i> 立即购买</button>
+          </div>
+        </div>
+
+        <!-- 商品卡 2 -->
+        <div class="product-card" data-product='{"name":"轻薄游戏笔记本","price":5999,"origin":6999,"emoji":"💻","bg":"linear-gradient(135deg,#4facfe 0%,#00f2fe 100%)","place":"上海","sales":3421}'>
+          <div class="product-img" style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%)">💻</div>
+          <div class="product-info">
+            <div class="product-name">14 英寸轻薄游戏本 i7-13620H RTX4060 2.5K 165Hz</div>
+            <div class="product-meta"><span class="place">上海</span><span class="sales">已售 3421</span></div>
+            <div class="product-price-row">
+              <span class="product-price">¥5999</span>
+              <span class="product-origin">¥6999</span>
+            </div>
+            <button class="product-buy" data-action="open-detail"><i class="fa-solid fa-cart-plus"></i> 立即购买</button>
+          </div>
+        </div>
+
+        <!-- 商品卡 3 -->
+        <div class="product-card" data-product='{"name":"保湿精华液 30ml","price":168,"origin":299,"emoji":"🧴","bg":"linear-gradient(135deg,#ffecd2 0%,#fcb69f 100%)","place":"杭州","sales":56789}'>
+          <div class="product-img" style="background:linear-gradient(135deg,#ffecd2 0%,#fcb69f 100%)">🧴</div>
+          <div class="product-info">
+            <div class="product-name">玻尿酸保湿精华液 深层补水 淡化细纹 敏感肌可用 30ml</div>
+            <div class="product-meta"><span class="place">浙江杭州</span><span class="sales">已售 5.6w+</span></div>
+            <div class="product-price-row">
+              <span class="product-price">¥168</span>
+              <span class="product-origin">¥299</span>
+            </div>
+            <button class="product-buy" data-action="open-detail"><i class="fa-solid fa-cart-plus"></i> 立即购买</button>
+          </div>
+        </div>
+
+        <!-- 商品卡 4 -->
+        <div class="product-card" data-product='{"name":"男士运动跑步鞋","price":299,"origin":459,"emoji":"👟","bg":"linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%)","place":"福建莆田","sales":23456}'>
+          <div class="product-img" style="background:linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%)">👟</div>
+          <div class="product-info">
+            <div class="product-name">男士轻便透气跑步鞋 缓震防滑 网面运动鞋 百搭休闲</div>
+            <div class="product-meta"><span class="place">福建莆田</span><span class="sales">已售 2.3w+</span></div>
+            <div class="product-price-row">
+              <span class="product-price">¥299</span>
+              <span class="product-origin">¥459</span>
+            </div>
+            <button class="product-buy" data-action="open-detail"><i class="fa-solid fa-cart-plus"></i> 立即购买</button>
+          </div>
+        </div>
+
+        <!-- 商品卡 5 -->
+        <div class="product-card" data-product='{"name":"有机红富士苹果 5斤","price":39.9,"origin":68,"emoji":"🍎","bg":"linear-gradient(135deg,#ff9a9e 0%,#fecfef 100%)","place":"山东烟台","sales":89234}'>
+          <div class="product-img" style="background:linear-gradient(135deg,#ff9a9e 0%,#fecfef 100%)">🍎</div>
+          <div class="product-info">
+            <div class="product-name">烟台红富士苹果 脆甜多汁 产地直发 5 斤装 顺丰包邮</div>
+            <div class="product-meta"><span class="place">山东烟台</span><span class="sales">已售 8.9w+</span></div>
+            <div class="product-price-row">
+              <span class="product-price">¥39.9</span>
+              <span class="product-origin">¥68</span>
+            </div>
+            <button class="product-buy" data-action="open-detail"><i class="fa-solid fa-cart-plus"></i> 立即购买</button>
+          </div>
+        </div>
+
+        <!-- 商品卡 6 -->
+        <div class="product-card" data-product='{"name":"北欧风懒人沙发","price":899,"origin":1599,"emoji":"🛋️","bg":"linear-gradient(135deg,#667eea 0%,#764ba2 100%)","place":"广东佛山","sales":4521}'>
+          <div class="product-img" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)">🛋️</div>
+          <div class="product-info">
+            <div class="product-name">北欧风懒人沙发 榻榻米卧室客厅小户型 可拆洗 网红款</div>
+            <div class="product-meta"><span class="place">广东佛山</span><span class="sales">已售 4521</span></div>
+            <div class="product-price-row">
+              <span class="product-price">¥899</span>
+              <span class="product-origin">¥1599</span>
+            </div>
+            <button class="product-buy" data-action="open-detail"><i class="fa-solid fa-cart-plus"></i> 立即购买</button>
+          </div>
+        </div>
+
+        <!-- 商品卡 7 -->
+        <div class="product-card" data-product='{"name":"游戏皮肤·暗夜猎手","price":68,"origin":128,"emoji":"🎮","bg":"linear-gradient(135deg,#0f2027 0%,#2c5364 100%)","place":"虚拟道具","sales":15678}'>
+          <div class="product-img" style="background:linear-gradient(135deg,#0f2027 0%,#2c5364 100%)">🎮</div>
+          <div class="product-info">
+            <div class="product-name">游戏皮肤·暗夜猎手 永久典藏 附赠专属头像框与击杀特效</div>
+            <div class="product-meta"><span class="place">虚拟道具</span><span class="sales">已售 1.5w+</span></div>
+            <div class="product-price-row">
+              <span class="product-price">¥68</span>
+              <span class="product-origin">¥128</span>
+            </div>
+            <button class="product-buy" data-action="open-detail"><i class="fa-solid fa-cart-plus"></i> 立即购买</button>
+          </div>
+        </div>
+
+        <!-- 商品卡 8 -->
+        <div class="product-card" data-product='{"name":"便携咖啡机","price":459,"origin":699,"emoji":"☕","bg":"linear-gradient(135deg,#d4a574 0%,#8b5a2b 100%)","place":"浙江宁波","sales":6789}'>
+          <div class="product-img" style="background:linear-gradient(135deg,#d4a574 0%,#8b5a2b 100%)">☕</div>
+          <div class="product-info">
+            <div class="product-name">意式浓缩便携咖啡机 家用小型 一键萃取 办公室神器</div>
+            <div class="product-meta"><span class="place">浙江宁波</span><span class="sales">已售 6789</span></div>
+            <div class="product-price-row">
+              <span class="product-price">¥459</span>
+              <span class="product-origin">¥699</span>
+            </div>
+            <button class="product-buy" data-action="open-detail"><i class="fa-solid fa-cart-plus"></i> 立即购买</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部悬浮购物车/结算条 -->
+    <div class="shop-cart-bar" id="shopCartBar">
+      <div class="scb-left">
+        <div class="scb-cart">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="scb-count" id="scbCount">0</span>
+        </div>
+        <div class="scb-info">
+          <div class="scb-total">合计：<strong id="scbTotal">¥0.00</strong></div>
+          <div class="scb-hint">满 99 免运费 · 支持 7 天无理由</div>
+        </div>
+      </div>
+      <button class="scb-checkout" id="scbCheckoutBtn"><i class="fa-solid fa-credit-card"></i> 去结算</button>
+    </div>
+  </section>
+
+  <!-- ==================== 商品详情 Modal ==================== -->
+  <div class="modal" id="shopDetailModal">
+    <div class="modal-content wide shop-detail-modal">
+      <button class="close-upgrade" data-close="shopDetailModal"><i class="fa-solid fa-xmark"></i></button>
+      <div class="sd-top">
+        <div class="sd-img" id="sdImg">🎧</div>
+        <div class="sd-body">
+          <h3 id="sdTitle">主动降噪蓝牙耳机</h3>
+          <div class="sd-price-row">
+            <span class="sd-price" id="sdPrice">¥399</span>
+            <span class="sd-origin" id="sdOrigin">¥799</span>
+            <span class="sd-discount">5 折</span>
+          </div>
+          <div class="sd-meta">
+            <span><i class="fa-solid fa-location-dot"></i> <span id="sdPlace">广东深圳</span></span>
+            <span><i class="fa-solid fa-fire"></i> <span id="sdSales">已售 1.2w+</span></span>
+            <span><i class="fa-solid fa-truck"></i> 48 小时发货</span>
+          </div>
+
+          <div class="specs-select">
+            <div class="spec-group">
+              <label>颜色</label>
+              <div class="spec-options">
+                <button class="spec-opt active" data-spec="color" data-val="曜石黑">曜石黑</button>
+                <button class="spec-opt" data-spec="color" data-val="云雾白">云雾白</button>
+                <button class="spec-opt" data-spec="color" data-val="樱花粉">樱花粉</button>
+                <button class="spec-opt" data-spec="color" data-val="天际蓝">天际蓝</button>
+              </div>
+            </div>
+            <div class="spec-group">
+              <label>版本</label>
+              <div class="spec-options">
+                <button class="spec-opt active" data-spec="size" data-val="标准版">标准版</button>
+                <button class="spec-opt" data-spec="size" data-val="Pro 版 +¥100">Pro 版 +¥100</button>
+                <button class="spec-opt" data-spec="size" data-val="Max 版 +¥200">Max 版 +¥200</button>
+              </div>
+            </div>
+            <div class="spec-group">
+              <label>数量</label>
+              <div class="qty-ctrl">
+                <button class="qty-btn" id="qtyMinus"><i class="fa-solid fa-minus"></i></button>
+                <input type="number" class="qty-input" id="qtyInput" value="1" min="1" max="99">
+                <button class="qty-btn" id="qtyPlus"><i class="fa-solid fa-plus"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="address-form">
+        <h4><i class="fa-solid fa-location-dot"></i> 收货地址</h4>
+        <div class="af-grid">
+          <div class="form-group"><label>收件人</label><input type="text" id="afName" placeholder="请输入姓名"></div>
+          <div class="form-group"><label>手机号</label><input type="tel" id="afPhone" placeholder="请输入手机号" maxlength="11"></div>
+          <div class="form-group full"><label>详细地址</label><input type="text" id="afAddr" placeholder="省市区 + 街道门牌"></div>
+        </div>
+      </div>
+
+      <div class="sd-actions">
+        <button class="btn-outline" id="sdAddCartBtn"><i class="fa-solid fa-cart-plus"></i> 加入购物车</button>
+        <button class="btn-primary big" id="sdBuyNowBtn"><i class="fa-solid fa-bolt"></i> 立即购买</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 下单成功 Modal ==================== -->
+  <div class="modal" id="shopOrderOkModal">
+    <div class="modal-content shop-order-ok">
+      <div class="ook-icon">✅</div>
+      <h3>下单成功！</h3>
+      <p class="ook-sub">感谢您的支持，我们将尽快为您发货</p>
+      <div class="ook-details">
+        <div class="ook-row"><span>订单编号</span><strong id="ookNo">—</strong></div>
+        <div class="ook-row"><span>收货地址</span><strong id="ookAddr">—</strong></div>
+        <div class="ook-row"><span>预计送达</span><strong>3-5 个工作日</strong></div>
+        <div class="ook-row"><span>物流查询</span><strong class="ook-track" id="ookTrack">待发货</strong></div>
+      </div>
+      <div class="ook-actions">
+        <button class="btn-outline" data-close="shopOrderOkModal">返回商城</button>
+        <button class="btn-primary" id="ookViewOrderBtn"><i class="fa-solid fa-file-invoice"></i> 查看订单</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 帖子详情 Modal（圈圈频道） ==================== -->
+  <div class="modal channelPostModal" id="channelPostModal">
+    <div class="modal-content channel-post-detail">
+      <button class="modal-close" data-close="channelPostModal"><i class="fa-solid fa-xmark"></i></button>
+
+      <!-- 帖子主体 -->
+      <div class="detail-post-header">
+        <div class="post-author-avatar big"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=gamer%20guy%20avatar&image_size=square" alt=""></div>
+        <div class="post-author-info">
+          <span class="post-author-name">电竞老王</span>
+          <span class="post-time">2 小时前</span>
+          <span class="post-channel-tag"># LOL英雄联盟</span>
+        </div>
+        <button class="modal-close-x"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="detail-post-body">
+        <h2 class="detail-post-title">S14赛季最强上单英雄盘点，第一名居然是他？</h2>
+        <p class="detail-post-text">从青铜到王者版本答案，详细数据带分析，亲测有效！这赛季上单真的百花齐放，大家快冲！以下是我整理的完整英雄评级表和实战技巧，希望对大家有帮助～</p>
+
+        <div class="detail-post-images">
+          <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=league%20of%20legends%20top%20lane%20champion%20s14%20season&image_size=landscape_16_9" alt="post">
+        </div>
+      </div>
+
+      <!-- 点赞/评论/分享 统计 -->
+      <div class="detail-post-stats">
+        <button class="detail-stat like-btn active"><i class="fa-solid fa-heart"></i> <span>1284</span></button>
+        <button class="detail-stat"><i class="fa-regular fa-comment-dots"></i> <span>842 评论</span></button>
+        <button class="detail-stat"><i class="fa-regular fa-bookmark"></i> <span>收藏</span></button>
+        <button class="detail-stat"><i class="fa-solid fa-share-nodes"></i> <span>分享</span></button>
+      </div>
+
+      <!-- 评论区 -->
+      <div class="detail-comments">
+        <h4 class="comments-title"><i class="fa-regular fa-comment-dots"></i> 评论 (842)</h4>
+
+        <!-- 评论 1（带回复） -->
+        <div class="comment-item">
+          <div class="comment-avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=anime%20girl%20pink%20hair&image_size=square" alt=""></div>
+          <div class="comment-body">
+            <div class="comment-author">南城以北</div>
+            <div class="comment-text">说得好！我也是靠这个冲上钻石的 👍</div>
+            <div class="comment-meta">
+              <span class="comment-time">1 小时前</span>
+              <button class="comment-reply-btn">回复</button>
+              <button class="comment-like-btn"><i class="fa-regular fa-heart"></i> 89</button>
+            </div>
+
+            <!-- 嵌套回复 -->
+            <div class="comment-replies">
+              <div class="comment-item nested">
+                <div class="comment-avatar small"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=handsome%20guy%20minimalist%20portrait&image_size=square" alt=""></div>
+                <div class="comment-body">
+                  <div class="comment-author">夜话先生 <span class="reply-to">回复 @南城以北</span></div>
+                  <div class="comment-text">哈哈一起开黑啊！</div>
+                  <div class="comment-meta">
+                    <span class="comment-time">45 分钟前</span>
+                    <button class="comment-reply-btn">回复</button>
+                    <button class="comment-like-btn"><i class="fa-regular fa-heart"></i> 12</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 评论 2 -->
+        <div class="comment-item">
+          <div class="comment-avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt=""></div>
+          <div class="comment-body">
+            <div class="comment-author">糖糖酱</div>
+            <div class="comment-text">求带求带 🥺</div>
+            <div class="comment-meta">
+              <span class="comment-time">30 分钟前</span>
+              <button class="comment-reply-btn">回复</button>
+              <button class="comment-like-btn"><i class="fa-regular fa-heart"></i> 5</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部评论输入 -->
+      <div class="detail-reply-input">
+        <div class="reply-avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20anime%20girl%20avatar%20portrait%20minimal&image_size=square" alt=""></div>
+        <input type="text" class="reply-field" id="detailReplyField" placeholder="说点什么...">
+        <button class="reply-send" id="detailReplySend"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ============ 移动端底部 TabBar ============ -->
+<nav class="mobile-tabbar" id="mobileTabbar">
+  <div class="mtab active" data-view="discover"><i class="fa-solid fa-compass"></i><span>发现</span></div>
+  <div class="mtab" data-view="match"><i class="fa-solid fa-heart"></i><span>匹配</span></div>
+  <div class="mtab" data-action="startVoice"><div class="fab-btn"><i class="fa-solid fa-plus"></i></div></div>
+  <div class="mtab" data-view="voice"><i class="fa-solid fa-microphone"></i><span>语音房</span></div>
+  <div class="mtab" data-view="chat"><i class="fa-solid fa-comment-dots"></i><span>消息</span></div>
+</nav>
+
+<!-- ============ 侧边栏遮罩（移动端） ============ -->
+<div class="sidebar-mask" id="sidebarMask"></div>
+
+<!-- ============ VIP 会员升级弹窗 ============ -->
+<div class="modal" id="upgradeModal">
+  <div class="modal-content wide upgrade-modal">
+    <button class="close-upgrade" data-close="upgradeModal"><i class="fa-solid fa-xmark"></i></button>
+    <div class="upgrade-banner">
+      <div class="upgrade-bg"></div>
+      <div class="upgrade-banner-content">
+        <div class="crown-icon"><i class="fa-solid fa-crown"></i></div>
+        <h2>圈圈高级会员</h2>
+        <p>✨ 解锁全部特权 · 送礼 8 折 · 专属装扮</p>
+      </div>
+    </div>
+
+    <div class="upgrade-plans">
+      <div class="plan-card" data-plan="month">
+        <div class="plan-name">月度会员</div>
+        <div class="plan-price"><span class="p-symbol">￥</span><span class="p-num">18</span><span class="p-unit">/月</span></div>
+        <ul class="plan-benefits"><li>✓ 查看谁喜欢了你</li><li>✓ 无限右滑次数</li><li>✓ 无广告</li></ul>
+        <button class="plan-buy" data-plan="month">立即开通</button>
+      </div>
+
+      <div class="plan-card recommended" data-plan="quarter">
+        <div class="plan-tag">🔥 最热门</div>
+        <div class="plan-name">季度会员</div>
+        <div class="plan-price"><span class="p-symbol">￥</span><span class="p-num">48</span><span class="p-unit">/季</span></div>
+        <div class="plan-save">节省 ￥6</div>
+        <ul class="plan-benefits"><li>✓ 包含月度全部特权</li><li>✓ 位置穿梭（GPS伪装）</li><li>✓ 专属头像框</li></ul>
+        <button class="plan-buy primary" data-plan="quarter">立即开通</button>
+      </div>
+
+      <div class="plan-card best" data-plan="year">
+        <div class="plan-tag">🏆 超值之选</div>
+        <div class="plan-name">年度会员</div>
+        <div class="plan-price"><span class="p-symbol">￥</span><span class="p-num">168</span><span class="p-unit">/年</span></div>
+        <div class="plan-save big">节省 ￥48 + 送 1000 💎</div>
+        <ul class="plan-benefits"><li>✓ 包含季度全部特权</li><li>✓ 1000 钻石赠送</li><li>✓ 开播 1.5x 流量扶持</li><li>✓ 专属客服</li></ul>
+        <button class="plan-buy primary" data-plan="year">立即开通</button>
+      </div>
+    </div>
+
+    <div class="upgrade-compare">
+      <h4>会员特权对比</h4>
+      <table>
+        <thead>
+          <tr><th>特权</th><th>普通用户</th><th>高级会员</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>每日右滑次数</td><td>50 次/天</td><td>无限次</td></tr>
+          <tr><td>查看谁喜欢了你</td><td>❌</td><td>✅</td></tr>
+          <tr><td>位置穿梭</td><td>❌</td><td>✅</td></tr>
+          <tr><td>专属头像框/名片</td><td>❌</td><td>✅</td></tr>
+          <tr><td>语音房送礼折扣</td><td>无</td><td>9 折</td></tr>
+          <tr><td>开播流量扶持</td><td>基础</td><td>1.5x</td></tr>
+          <tr><td>广告</td><td>有</td><td>无</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="payment-channels">
+      <h4>选择支付方式</h4>
+      <div class="pay-options">
+        <label class="pay-option active">
+          <input type="radio" name="pay" checked>
+          <i class="fa-brands fa-weixin" style="color:#07c160"></i>
+          <span>微信支付</span>
+        </label>
+        <label class="pay-option">
+          <input type="radio" name="pay">
+          <i class="fa-brands fa-alipay" style="color:#1677ff"></i>
+          <span>支付宝</span>
+        </label>
+        <label class="pay-option">
+          <input type="radio" name="pay">
+          <i class="fa-solid fa-credit-card" style="color:#8b5cf6"></i>
+          <span>银行卡</span>
+        </label>
+        <label class="pay-option">
+          <input type="radio" name="pay">
+          <i class="fa-brands fa-apple-pay" style="color:#fff"></i>
+          <span>Apple Pay</span>
+        </label>
+      </div>
+      <div class="pay-qr-note">
+        💡 支付由官方支付通道处理，开通后会员权益即时生效。如需接入微信支付 / 支付宝，请在后台配置商户号与密钥，后端会在支付回调验签后发放权益。
+      </div>
+    </div>
+
+    <div class="upgrade-footer">
+      <button class="restore-btn">恢复购买</button>
+      <p class="upgrade-agreement">
+        会员服务由官方支付通道处理，开通后即时生效，到期自动失效。查看 <a href="#">《会员服务协议》</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 管理员后台 ============ -->
+<div class="modal" id="adminModal">
+  <div class="modal-content wide admin-modal">
+    <button class="close-upgrade" data-close="adminModal"><i class="fa-solid fa-xmark"></i></button>
+    <div class="admin-header">
+      <h2><i class="fa-solid fa-screwdriver-wrench"></i> 管理员后台</h2>
+      <div class="admin-auth-row">
+        <input type="text" id="adminUserInput" placeholder="管理员账号" autocomplete="username">
+        <input type="password" id="adminPassInput" placeholder="管理员密码" autocomplete="current-password">
+        <button class="btn-primary tiny" id="adminAuthBtn">登录</button>
+        <button class="btn-outline tiny" id="adminLogoutBtn" style="display:none">退出</button>
+      </div>
+    </div>
+
+    <!-- 数据概览 -->
+    <div class="admin-section" id="adminStatsSection" style="display:none">
+      <h3>📊 平台概览</h3>
+      <div class="admin-stats-grid" id="adminStatsGrid"></div>
+    </div>
+
+    <!-- 商城管理 -->
+    <div class="admin-section" id="adminShopSection" style="display:none">
+      <h3>🛒 商城物品管理</h3>
+      <div class="admin-shop-toolbar">
+        <button class="btn-primary tiny" id="adminAddItemBtn">
+          <i class="fa-solid fa-plus"></i> 新增物品
+        </button>
+        <input type="text" id="adminShopSearch" placeholder="搜索物品...">
+        <select id="adminShopFilter">
+          <option value="">全部分类</option>
+          <option value="gift">礼物</option>
+          <option value="title">称号</option>
+          <option value="avatar_frame">头像框</option>
+          <option value="bubble">气泡</option>
+          <option value="effect">特效</option>
+        </select>
+      </div>
+      <div class="admin-shop-list" id="adminShopList"></div>
+    </div>
+
+    <!-- 新增/编辑弹窗 -->
+    <div class="admin-item-form" id="adminItemForm" style="display:none">
+      <h4 id="adminItemFormTitle">新增物品</h4>
+      <div class="admin-form-grid">
+        <label>item_key <input type="text" id="af_item_key" placeholder="gift_rose"></label>
+        <label>名称 <input type="text" id="af_name" placeholder="玫瑰"></label>
+        <label>图标 <input type="text" id="af_icon" placeholder="🌹"></label>
+        <label>分类
+          <select id="af_category">
+            <option value="gift">礼物</option>
+            <option value="title">称号</option>
+            <option value="avatar_frame">头像框</option>
+            <option value="bubble">气泡</option>
+            <option value="effect">特效</option>
+          </select>
+        </label>
+        <label>价格（金币）<input type="number" id="af_price" value="0" min="0"></label>
+        <label>好感度加成<input type="number" id="af_fav" value="0" min="0"></label>
+        <label>解锁好感度<input type="number" id="af_unlock" value="0" min="0"></label>
+        <label>是否上架
+          <select id="af_available">
+            <option value="1">上架</option>
+            <option value="0">下架</option>
+          </select>
+        </label>
+      </div>
+      <label>描述 <textarea id="af_desc" rows="2" placeholder="物品描述"></textarea></label>
+      <div class="admin-form-actions">
+        <button class="btn-outline tiny" id="afCancelBtn">取消</button>
+        <button class="btn-primary tiny" id="afSaveBtn">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 匹配成功动画 ============ -->
+<div class="match-success" id="matchSuccess">
+  <div class="match-success-inner">
+    <div class="success-hearts"><i class="fa-solid fa-heart"></i><i class="fa-solid fa-heart"></i><i class="fa-solid fa-heart"></i></div>
+    <h2>🎉 匹配成功！</h2>
+    <p>你和 <strong>奶糖不加冰</strong> 互相喜欢了</p>
+    <div class="match-avatars"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt=""><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=beautiful%20girl%20anime%20realistic%20pink%20dress&image_size=square" alt=""></div>
+    <div class="success-btns"><button class="btn-outline" id="matchCloseBtn">继续探索</button><button class="btn-primary">发消息 →</button></div>
+  </div>
+</div>
+
+<!-- ============ 创建语音房弹窗 ============ -->
+<div class="modal" id="createRoomModal">
+  <div class="modal-content">
+    <h3><i class="fa-solid fa-microphone"></i> 创建语音房</h3>
+    <div class="form-group">
+      <label>房间主题</label>
+      <input type="text" id="roomTopicInput" placeholder="例如：LOL开黑缺打野、深夜情感电台..." value="深夜电台 · 聊心事">
+    </div>
+    <div class="form-group">
+      <label>房间类型</label>
+      <div class="seg" style="gap:8px">
+        <button type="button" class="seg-btn room-type-btn active" data-type="multi" style="flex:1"><i class="fa-solid fa-users"></i> 多人语音房</button>
+        <button type="button" class="seg-btn room-type-btn" data-type="single" style="flex:1"><i class="fa-solid fa-user"></i> 单人聊天房</button>
+      </div>
+    </div>
+    <div class="form-group"><label>入场权限</label><div class="seg"><span class="seg-btn active">公开房</span><span class="seg-btn">密码房</span><span class="seg-btn">仅邀请</span></div></div>
+    <div class="form-group"><label>分类标签</label><div class="tag-picker"><span class="tag-pick active">💕 情感</span><span class="tag-pick">🎮 游戏</span><span class="tag-pick">🎵 音乐</span><span class="tag-pick">📚 读书</span><span class="tag-pick">🌙 深夜</span><span class="tag-pick">🍜 美食</span></div></div>
+    <div class="form-group"><label>背景音效</label><div class="tag-picker"><span class="tag-pick active">雨声</span><span class="tag-pick">咖啡馆</span><span class="tag-pick">篝火</span><span class="tag-pick">海浪</span><span class="tag-pick">安静</span></div></div>
+    <div class="modal-actions">
+      <button class="btn-outline" id="closeCreateRoom" data-close="createRoomModal">取消</button>
+      <button class="btn-primary" id="submitCreateRoom"><i class="fa-solid fa-play"></i> 立即开播</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 发布动态弹窗 ============ -->
+<div class="modal" id="postModal">
+  <div class="modal-content wide">
+    <div class="post-modal-head">
+      <button class="btn-ghost" data-close="postModal">取消</button>
+      <h3>发布动态</h3>
+      <button class="btn-primary tiny" id="submitPost">发布</button>
+    </div>
+    <div class="post-modal-body">
+      <div class="post-input">
+        <textarea id="postText" placeholder="分享你的想法、心情、故事... 加 #话题# 让更多人看到"></textarea>
+        <div class="char-count"><span id="postChar">0</span>/500</div>
+      </div>
+      <div class="post-toolbar">
+        <button data-ptool="image"><i class="fa-solid fa-image"></i> 图片</button>
+        <button data-ptool="video"><i class="fa-solid fa-video"></i> 视频</button>
+        <button data-ptool="audio"><i class="fa-solid fa-microphone"></i> 音频</button>
+        <button data-ptool="topic"><i class="fa-solid fa-hashtag"></i> 话题</button>
+        <button data-ptool="location"><i class="fa-solid fa-location-dot"></i> 位置</button>
+        <button data-ptool="voice"><i class="fa-solid fa-face-smile"></i> 心情</button>
+      </div>
+      <div class="post-preview">
+        <div class="preview-item"><div class="preview-placeholder"><i class="fa-solid fa-image"></i><span>点击添加图片</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 通知中心（右侧抽屉） ============ -->
+<div class="drawer" id="notifDrawer">
+  <div class="drawer-mask" data-close="notifDrawer"></div>
+  <div class="drawer-panel">
+    <div class="drawer-head">
+      <h3><i class="fa-solid fa-bell"></i> 通知中心</h3>
+      <div class="drawer-actions">
+        <button class="btn-ghost tiny" id="notifMarkAllBtn"><i class="fa-solid fa-check-double"></i> 全部已读</button>
+        <button class="icon-btn" data-close="notifDrawer" aria-label="关闭通知"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="notif-tabs">
+      <span class="ntab active" data-notif-type="all">全部 <span class="nc">12</span></span>
+      <span class="ntab" data-notif-type="like">点赞 <span class="nc">8</span></span>
+      <span class="ntab" data-notif-type="comment">评论 <span class="nc">3</span></span>
+      <span class="ntab" data-notif-type="follow">关注 <span class="nc">1</span></span>
+      <span class="ntab" data-notif-type="system">系统</span>
+    </div>
+    <div class="notif-list">
+      <div class="notif-item unread"><div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt=""></div><div class="notif-body"><div class="notif-text"><strong>糖糖酱</strong> 给你的动态点了赞❤️</div><div class="notif-time">2分钟前</div></div><span class="unread-dot"></span></div>
+      <div class="notif-item unread"><div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=handsome%20guy%20minimalist%20portrait&image_size=square" alt=""></div><div class="notif-body"><div class="notif-text"><strong>清风明月</strong> 关注了你</div><div class="notif-time">15分钟前</div></div><span class="unread-dot"></span></div>
+      <div class="notif-item system"><div class="avatar sys"><i class="fa-solid fa-gift"></i></div><div class="notif-body"><div class="notif-text">🎉 你已连续登录 7 天，奖励 <strong>💎 70</strong></div><div class="notif-time">今天 08:00</div></div></div>
+      <div class="notif-item"><div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=anime%20boy%20hoodie%20dark%20aesthetic&image_size=square" alt=""></div><div class="notif-body"><div class="notif-text"><strong>夜话先生</strong> 回复了你的评论</div><div class="notif-time">2小时前</div></div></div>
+      <div class="notif-item match"><div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=beautiful%20girl%20anime%20realistic%20pink%20dress&image_size=square" alt=""></div><div class="notif-body"><div class="notif-text">💘 你和 <strong>奶糖不加冰</strong> 互相喜欢了</div><div class="notif-time">昨天</div></div></div>
+      <div class="notif-item"><div class="avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=girl%20artist%20painting&image_size=square" alt=""></div><div class="notif-body"><div class="notif-text"><strong>画画的阿猫</strong> 评论了你的动态：好感人😭</div><div class="notif-time">昨天</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 设置中心（右侧抽屉） ============ -->
+<div class="drawer" id="settingsDrawer">
+  <div class="drawer-mask" data-close="settingsDrawer"></div>
+  <div class="drawer-panel">
+    <div class="drawer-head"><h3><i class="fa-solid fa-gear"></i> 设置</h3><button class="icon-btn" data-close="settingsDrawer" aria-label="关闭设置"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="settings-list">
+      <div class="setting-group">
+        <h5>外观</h5>
+        <div class="setting-row"><span><i class="fa-solid fa-moon"></i> 主题模式</span><div class="seg compact"><span class="seg-btn">浅色</span><span class="seg-btn active">深色</span><span class="seg-btn">跟随系统</span></div></div>
+        <div class="setting-row"><span><i class="fa-solid fa-palette"></i> 强调色</span><div class="color-picker"><span class="cp active" style="--c:#a855f7"></span><span class="cp" style="--c:#ec4899"></span><span class="cp" style="--c:#6366f1"></span><span class="cp" style="--c:#10b981"></span><span class="cp" style="--c:#f59e0b"></span></div></div>
+      </div>
+      <div class="setting-group">
+        <h5>通知</h5>
+        <div class="setting-row switch"><span><i class="fa-solid fa-volume-high"></i> 消息声音</span><label class="toggle on"><input type="checkbox" checked><span></span></label></div>
+        <div class="setting-row switch"><span><i class="fa-solid fa-bell"></i> 推送通知</span><label class="toggle on"><input type="checkbox" checked><span></span></label></div>
+        <div class="setting-row switch"><span><i class="fa-solid fa-headphones"></i> 语音房震动</span><label class="toggle"><input type="checkbox"><span></span></label></div>
+      </div>
+      <div class="setting-group">
+        <h5>隐私与安全</h5>
+        <a class="setting-link" href="#"><i class="fa-solid fa-user-shield"></i> 账号与隐私 <i class="fa-solid fa-chevron-right"></i></a>
+        <a class="setting-link" href="#"><i class="fa-solid fa-lock"></i> 账号安全 <i class="fa-solid fa-chevron-right"></i></a>
+        <a class="setting-link" href="#"><i class="fa-solid fa-shield-halved"></i> 黑名单 <i class="fa-solid fa-chevron-right"></i></a>
+        <a class="setting-link" href="#"><i class="fa-solid fa-location-dot"></i> 位置权限 <i class="fa-solid fa-chevron-right"></i></a>
+      </div>
+      <div class="setting-group">
+        <h5>通用</h5>
+        <a class="setting-link" href="#"><i class="fa-solid fa-language"></i> 语言 <span class="sl">简体中文</span><i class="fa-solid fa-chevron-right"></i></a>
+        <a class="setting-link" href="#"><i class="fa-solid fa-circle-info"></i> 关于圈圈语音社 v2.3.0 <i class="fa-solid fa-chevron-right"></i></a>
+        <a class="setting-link danger" href="#"><i class="fa-solid fa-right-from-bracket"></i> 退出登录</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 通用信息 ============ -->
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <h3 id="infoModalTitle">详细信息</h3>
+    <div id="infoModalBody" class="info-modal-body"></div>
+    <div class="modal-actions"><button class="btn-outline" data-close="infoModal">关闭</button></div>
+  </div>
+</div>
+
+<!-- ============ 统一搜索 ============ -->
+<div class="search-modal" id="searchModal">
+  <div class="search-backdrop" data-close="searchModal"></div>
+  <div class="search-container">
+    <div class="search-input-row">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="globalSearchInput" placeholder="搜索用户、频道、话题、动态...">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="search-suggestions" id="searchSuggest">
+      <div class="suggest-group"><h5>热门搜索</h5>
+        <div class="suggest-tags">
+          <span>#深夜电台</span><span>#LOL开黑</span><span>#连麦看电影</span><span>#独立音乐</span><span>#今日话题</span>
+        </div>
+      </div>
+      <div class="suggest-group"><h5>搜索历史</h5>
+        <div class="suggest-tags">
+          <span><i class="fa-solid fa-clock-rotate-left"></i> 电竞老王</span>
+          <span><i class="fa-solid fa-clock-rotate-left"></i> LOL英雄联盟圈</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 语音/视频通话界面 ============ -->
+<div class="call-modal" id="callModal">
+  <div class="call-bg"></div>
+  <div class="call-video-area" id="callVideoArea">
+    <div class="call-remote">
+      <div class="call-remote-avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=portrait_4_3" alt=""></div>
+      <div class="call-remote-info"><strong class="call-remote-name">糖糖酱</strong><span id="callTimer">00:00</span></div>
+    </div>
+    <div class="call-local"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20anime%20girl%20avatar%20portrait%20minimal&image_size=square" alt=""></div>
+  </div>
+  <div class="call-controls">
+    <button class="call-ctrl" id="callMicToggle" title="静音"><i class="fa-solid fa-microphone"></i></button>
+    <button class="call-ctrl" id="callVideoToggle" title="摄像头"><i class="fa-solid fa-video"></i></button>
+    <button class="call-ctrl" id="callSpeakerToggle" title="关闭扬声器"><i class="fa-solid fa-volume-high"></i></button>
+    <button class="call-ctrl" id="callVoiceSwitch" title="转接语音"><i class="fa-solid fa-phone"></i></button>
+    <button class="call-ctrl end" id="endCallBtn" title="挂断"><i class="fa-solid fa-phone"></i></button>
+  </div>
+  <div class="call-invite" id="callInvite" style="display:none">
+    <div class="call-invite-inner">
+      <div class="invite-avatar"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt=""></div>
+      <div class="invite-text"><strong>糖糖酱</strong> 正在邀请你<span id="callInviteType">视频</span>通话...</div>
+      <div class="invite-actions">
+        <button class="invite-btn decline"><i class="fa-solid fa-phone-slash"></i> 拒绝</button>
+        <button class="invite-btn accept"><i class="fa-solid fa-video"></i> 接受</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 礼物打赏系统（语音房内） ============ -->
+<div class="gift-panel" id="giftPanel">
+  <div class="gift-head"><span>💎 钻石余额: <strong>128</strong></span><div class="gift-head-actions"><button class="btn-primary tiny">充值</button><button class="icon-btn" data-close="giftPanel" aria-label="关闭礼物面板"><i class="fa-solid fa-xmark"></i></button></div></div>
+  <div class="gift-tabs"><span class="gtab active">热门</span><span class="gtab">特权</span><span class="gtab">特效</span><span class="gtab">豪华</span></div>
+  <div class="gift-grid" id="giftGrid"></div>
+  <div class="gift-bottom">
+    <label class="toggle"><input type="checkbox"><span></span> 连击模式</label>
+    <div class="gift-count">
+      <button>-</button><span>1</span><button>+</button>
+    </div>
+    <button class="btn-primary">赠送</button>
+  </div>
+</div>
+
+<!-- ============ 礼物弹幕层 ============ -->
+<div class="gift-barrage" id="giftBarrage"></div>
+
+<!-- ============ 钱包/充值 ============ -->
+<div class="modal" id="walletModal">
+  <div class="modal-content">
+    <h3><i class="fa-solid fa-coins"></i> 我的钱包</h3>
+    <div class="wallet-balance">
+      <div class="wallet-bg"></div>
+      <div class="wallet-content">
+        <div class="wallet-label">钻石余额</div>
+        <div class="wallet-amount">💎 128</div>
+        <div class="wallet-exchange">= ￥ 12.80</div>
+      </div>
+    </div>
+    <div class="form-group"><label>钻石充值</label>
+      <div class="coin-grid">
+        <div class="coin-item"><div class="coin-diamond">💎 6</div><span class="coin-price">￥6</span><button class="btn-sm tiny">充值</button></div>
+        <div class="coin-item hot"><div class="coin-diamond">💎 30</div><span class="coin-price">￥30</span><button class="btn-sm tiny">充值</button></div>
+        <div class="coin-item"><div class="coin-diamond">💎 68</div><span class="coin-price">￥68</span><button class="btn-sm tiny">充值</button></div>
+        <div class="coin-item popular"><div class="coin-diamond">💎 128</div><span class="coin-price">￥128</span><button class="btn-sm tiny primary">充值</button></div>
+        <div class="coin-item"><div class="coin-diamond">💎 328</div><span class="coin-price">￥328</span><button class="btn-sm tiny">充值</button></div>
+        <div class="coin-item"><div class="coin-diamond">💎 648</div><span class="coin-price">￥648</span><button class="btn-sm tiny">充值</button></div>
+      </div>
+    </div>
+    <div class="modal-actions"><button class="btn-outline" data-close="walletModal">关闭</button></div>
+  </div>
+</div>
+
+<!-- ============ 沉浸式语音房（TikTok/Kuaishou 风格） ============ -->
+<div class="room-modal voice-room-modal" id="roomModal">
+  <div class="voice-room-inner">
+
+    <!-- 顶部栏 -->
+    <div class="voice-room-topbar">
+      <button class="close-room" id="closeRoomBtn"><i class="fa-solid fa-xmark"></i></button>
+      <div class="voice-room-top-info">
+        <div class="voice-room-topic">深夜情感电台 · 聊心事 💔</div>
+        <div class="voice-room-meta">
+          <span class="voice-room-host">
+            <i class="fa-solid fa-circle-user"></i> 夜话先生
+          </span>
+          <span class="voice-room-listeners">
+            <i class="fa-solid fa-headphones"></i> 1,234 在听
+          </span>
+        </div>
+      </div>
+      <div class="voice-room-top-actions">
+        <button class="voice-room-top-btn" title="分享"><i class="fa-solid fa-share-nodes"></i></button>
+        <button class="voice-room-top-btn" title="举报"><i class="fa-solid fa-flag"></i></button>
+      </div>
+    </div>
+
+    <!-- ROSTER：圆形头像网格（TikTok Live 风格） -->
+    <div class="voice-room-roster-wrap">
+      <!-- 单人直播模式（主播一人突出显示，听众在下方） -->
+      <div class="voice-room-roster" id="voiceRoomRoster">
+
+        <!-- Host with crown -->
+        <div class="roster-avatar-slot host-slot">
+          <div class="roster-avatar">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=anime%20boy%20hoodie%20dark%20aesthetic&image_size=square" alt="">
+            <span class="host-badge">👑</span>
+            <div class="roster-mic-indicator room-mic-on">
+              <i class="fa-solid fa-microphone"></i>
+            </div>
+            <div class="roster-speaking-ring"></div>
+          </div>
+          <div class="roster-name">夜话先生</div>
+        </div>
+
+        <!-- Speaker 1 -->
+        <div class="roster-avatar-slot">
+          <div class="roster-avatar">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=girl%20anime%20cute&image_size=square" alt="">
+            <div class="roster-mic-indicator room-mic-on"><i class="fa-solid fa-microphone"></i></div>
+            <div class="roster-speaking-ring"></div>
+          </div>
+          <div class="roster-name">小鹿乱撞</div>
+        </div>
+
+        <!-- Speaker 2 (muted) -->
+        <div class="roster-avatar-slot">
+          <div class="roster-avatar">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=boy%20anime%20cool&image_size=square" alt="">
+            <div class="roster-mic-indicator room-mic-off"><i class="fa-solid fa-microphone-slash"></i></div>
+          </div>
+          <div class="roster-name">南城以北</div>
+        </div>
+
+        <!-- Speaker 3 -->
+        <div class="roster-avatar-slot">
+          <div class="roster-avatar">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=girl%20soft%20pink%20hair&image_size=square" alt="">
+            <div class="roster-mic-indicator room-mic-on"><i class="fa-solid fa-microphone"></i></div>
+            <div class="roster-speaking-ring"></div>
+          </div>
+          <div class="roster-name">奶糖不加冰</div>
+        </div>
+
+        <!-- Empty seat -->
+        <div class="roster-avatar-slot empty-slot">
+          <div class="roster-avatar empty">
+            <i class="fa-solid fa-plus"></i>
+          </div>
+          <div class="roster-name">点击上麦</div>
+        </div>
+
+        <!-- Empty seat -->
+        <div class="roster-avatar-slot empty-slot">
+          <div class="roster-avatar empty">
+            <i class="fa-solid fa-plus"></i>
+          </div>
+          <div class="roster-name">点击上麦</div>
+        </div>
+
+      </div>
+
+      <!-- 单人模式听众头像（底部一排） -->
+      <div class="voice-room-audience">
+        <div class="audience-title"><i class="fa-solid fa-users"></i> 在线听众</div>
+        <div class="audience-row">
+          <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cute%20girl%20kpop%20style&image_size=square" alt="">
+          <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=handsome%20guy%20minimalist%20portrait&image_size=square" alt="">
+          <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=girl%20artist%20painting&image_size=square" alt="">
+          <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=guy%20beanie%20casual%20city&image_size=square" alt="">
+          <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=girl%20glasses%20bookish&image_size=square" alt="">
+          <div class="audience-more">+1229</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BGM Player -->
+    <div class="bgm-bar">
+      <div class="bgm-player">
+        <div class="bgm-cover" style="background:linear-gradient(135deg,#6366f1,#ec4899);">
+          <i class="fa-solid fa-music"></i>
+        </div>
+        <div class="bgm-info">
+          <div class="bgm-title">夜曲</div>
+          <div class="bgm-artist">周杰伦</div>
+          <div class="bgm-progress"><div class="bgm-progress-fill" style="width:35%"></div></div>
+        </div>
+        <div class="bgm-controls">
+          <button class="bgm-btn" id="bgmPrevBtn" title="上一首"><i class="fa-solid fa-backward-step"></i></button>
+          <button class="bgm-btn play" id="bgmPlayBtn" title="播放/暂停"><i class="fa-solid fa-pause"></i></button>
+          <button class="bgm-btn" id="bgmNextBtn" title="下一首"><i class="fa-solid fa-forward-step"></i></button>
+        </div>
+        <div class="bgm-volume">
+          <i class="fa-solid fa-volume-high"></i>
+          <input type="range" min="0" max="100" value="60" class="bgm-volume-slider">
+        </div>
+        <button class="btn-outline tiny bgm-picker-btn" id="bgmPickerBtn">
+          <i class="fa-solid fa-music"></i> 选择背景音乐
+        </button>
+      </div>
+    </div>
+
+    <!-- 消息输入 + Emoji + Action Bar -->
+    <div class="voice-room-bottom">
+      <!-- 消息输入栏 -->
+      <div class="voice-room-chat-wrap">
+        <div class="voice-chat-display" id="voiceChatDisplay">
+          <div class="voice-chat-msg system">🎁 小鹿乱撞 送出 爱心 ×52</div>
+          <div class="voice-chat-msg"><span class="vc-name" style="color:#ffd700">小鹿乱撞:</span> 主播说得好好😭</div>
+          <div class="voice-chat-msg"><span class="vc-name">南城以北:</span> 点一首《可惜没如果》</div>
+          <div class="voice-chat-msg"><span class="vc-name">星野银河:</span> 新人报到！第一次来</div>
+        </div>
+        <div class="voice-chat-input-bar">
+          <button class="voice-input-btn emoji-picker-toggle" id="voiceEmojiBtn" title="表情">
+            <i class="fa-regular fa-face-smile"></i>
+          </button>
+          <input type="text" class="voice-chat-input" id="voiceChatInput" placeholder="说点什么...">
+          <button class="voice-input-btn voice-chat-send" id="voiceChatSendBtn" title="发送">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 操作按钮栏 -->
+      <div class="room-actions-bar voice-actions">
+        <button class="voice-action-btn" id="voiceMicBtn" title="开麦（多人模式）">
+          <i class="fa-solid fa-microphone"></i>
+          <span>开麦</span>
+        </button>
+        <button class="voice-action-btn game-picker-toggle" id="voiceGameBtn" title="小游戏">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>小游戏</span>
+        </button>
+        <button class="voice-action-btn gift-panel-toggle" id="voiceGiftBtn" title="送礼">
+          <i class="fa-solid fa-gift"></i>
+          <span>送礼</span>
+        </button>
+        <button class="voice-action-btn heart-btn" id="voiceHeartBtn" title="点赞">
+          <i class="fa-solid fa-heart"></i>
+          <span>点赞</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Gift Panel 内嵌（金币/钻石 Tab） -->
+    <div class="gift-panel voice-gift-panel" id="voiceGiftPanel">
+      <div class="gift-tabs gift-tab-row">
+        <span class="gtab gift-tab active" data-gift-currency="coins">🪙 金币礼物</span>
+        <span class="gtab gift-tab" data-gift-currency="diamonds">💎 钻石礼物</span>
+      </div>
+      <div class="gift-grid gift-coins-grid active">
+        <div class="gift-item" data-currency="coins"><div class="gift-emoji">🌹</div><div class="gift-name">玫瑰</div><div class="gift-price gift-price-coins">10 🪙</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="coins"><div class="gift-emoji">🍰</div><div class="gift-name">蛋糕</div><div class="gift-price gift-price-coins">30 🪙</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="coins"><div class="gift-emoji">🎵</div><div class="gift-name">点歌</div><div class="gift-price gift-price-coins">50 🪙</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="coins"><div class="gift-emoji">💘</div><div class="gift-name">爱心</div><div class="gift-price gift-price-coins">99 🪙</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="coins"><div class="gift-emoji">🎈</div><div class="gift-name">气球</div><div class="gift-price gift-price-coins">150 🪙</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="coins"><div class="gift-emoji">🍀</div><div class="gift-name">幸运草</div><div class="gift-price gift-price-coins">200 🪙</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="coins"><div class="gift-emoji">🎁</div><div class="gift-name">礼物盒</div><div class="gift-price gift-price-coins">300 🪙</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="coins"><div class="gift-emoji">🌟</div><div class="gift-name">小星星</div><div class="gift-price gift-price-coins">500 🪙</div><button class="gift-send-btn">发送</button></div>
+      </div>
+      <div class="gift-grid gift-diamonds-grid">
+        <div class="gift-item" data-currency="diamonds"><div class="gift-emoji">💎</div><div class="gift-name">钻石</div><div class="gift-price gift-price-diamonds">10 💎</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="diamonds"><div class="gift-emoji">🏆</div><div class="gift-name">奖杯</div><div class="gift-price gift-price-diamonds">50 💎</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="diamonds"><div class="gift-emoji">👑</div><div class="gift-name">皇冠</div><div class="gift-price gift-price-diamonds">100 💎</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="diamonds"><div class="gift-emoji">🚀</div><div class="gift-name">火箭</div><div class="gift-price gift-price-diamonds">500 💎</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="diamonds"><div class="gift-emoji">🐉</div><div class="gift-name">金龙</div><div class="gift-price gift-price-diamonds">888 💎</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="diamonds"><div class="gift-emoji">🎆</div><div class="gift-name">烟花</div><div class="gift-price gift-price-diamonds">1280 💎</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="diamonds"><div class="gift-emoji">🦄</div><div class="gift-name">独角兽</div><div class="gift-price gift-price-diamonds">2000 💎</div><button class="gift-send-btn">发送</button></div>
+        <div class="gift-item" data-currency="diamonds"><div class="gift-emoji">🎊</div><div class="gift-name">庆典</div><div class="gift-price gift-price-diamonds">5200 💎</div><button class="gift-send-btn">发送</button></div>
+      </div>
+    </div>
+
+    <!-- BGM Picker Modal -->
+    <div class="modal bgm-picker" id="bgmPickerModal">
+      <div class="modal-content bgm-picker-content">
+        <h3><i class="fa-solid fa-music"></i> 选择背景音乐</h3>
+        <div class="bgm-picker-list">
+          <div class="bgm-track-item active">
+            <div class="bgm-track-icon">🎵</div>
+            <div class="bgm-track-info">
+              <div class="bgm-track-title">夜曲</div>
+              <div class="bgm-track-artist">周杰伦</div>
+            </div>
+            <button class="bgm-track-play"><i class="fa-solid fa-volume-high"></i></button>
+          </div>
+          <div class="bgm-track-item">
+            <div class="bgm-track-icon">🎶</div>
+            <div class="bgm-track-info">
+              <div class="bgm-track-title">晴天</div>
+              <div class="bgm-track-artist">周杰伦</div>
+            </div>
+            <button class="bgm-track-play"><i class="fa-solid fa-play"></i></button>
+          </div>
+          <div class="bgm-track-item">
+            <div class="bgm-track-icon">🎤</div>
+            <div class="bgm-track-info">
+              <div class="bgm-track-title">稻香</div>
+              <div class="bgm-track-artist">周杰伦</div>
+            </div>
+            <button class="bgm-track-play"><i class="fa-solid fa-play"></i></button>
+          </div>
+          <div class="bgm-track-item">
+            <div class="bgm-track-icon">🎧</div>
+            <div class="bgm-track-info">
+              <div class="bgm-track-title">可惜没如果</div>
+              <div class="bgm-track-artist">林俊杰</div>
+            </div>
+            <button class="bgm-track-play"><i class="fa-solid fa-play"></i></button>
+          </div>
+          <div class="bgm-track-item">
+            <div class="bgm-track-icon">🎼</div>
+            <div class="bgm-track-info">
+              <div class="bgm-track-title">小幸运</div>
+              <div class="bgm-track-artist">田馥甄</div>
+            </div>
+            <button class="bgm-track-play"><i class="fa-solid fa-play"></i></button>
+          </div>
+          <div class="bgm-track-item">
+            <div class="bgm-track-icon">🎸</div>
+            <div class="bgm-track-info">
+              <div class="bgm-track-title">成都</div>
+              <div class="bgm-track-artist">赵雷</div>
+            </div>
+            <button class="bgm-track-play"><i class="fa-solid fa-play"></i></button>
+          </div>
+          <div class="bgm-track-item">
+            <div class="bgm-track-icon">🎹</div>
+            <div class="bgm-track-info">
+              <div class="bgm-track-title">后来</div>
+              <div class="bgm-track-artist">刘若英</div>
+            </div>
+            <button class="bgm-track-play"><i class="fa-solid fa-play"></i></button>
+          </div>
+          <div class="bgm-track-item">
+            <div class="bgm-track-icon">🎺</div>
+            <div class="bgm-track-info">
+              <div class="bgm-track-title">光年之外</div>
+              <div class="bgm-track-artist">邓紫棋</div>
+            </div>
+            <button class="bgm-track-play"><i class="fa-solid fa-play"></i></button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-outline" data-close="bgmPickerModal">取消</button>
+          <button class="btn-primary" id="bgmPickerConfirmBtn"><i class="fa-solid fa-check"></i> 确认播放</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Picker Modal -->
+    <div class="modal game-picker" id="gamePickerModal">
+      <div class="modal-content game-picker-content">
+        <h3><i class="fa-solid fa-gamepad"></i> 选择房间小游戏</h3>
+        <div class="game-picker-grid">
+          <div class="game-item" data-game="truth-dare">
+            <div class="game-icon">🎭</div>
+            <div class="game-info">
+              <div class="game-name">真心话大冒险</div>
+              <div class="game-desc">经典社交游戏 · 活跃气氛</div>
+            </div>
+            <button class="game-start-btn">开始</button>
+          </div>
+          <div class="game-item" data-game="number-bomb">
+            <div class="game-icon">💣</div>
+            <div class="game-info">
+              <div class="game-name">数字炸弹</div>
+              <div class="game-desc">猜中数字的人唱歌</div>
+            </div>
+            <button class="game-start-btn">开始</button>
+          </div>
+          <div class="game-item" data-game="guess-song">
+            <div class="game-icon">🎵</div>
+            <div class="game-info">
+              <div class="game-name">猜歌名</div>
+              <div class="game-desc">听片段猜歌名 · 看谁最快</div>
+            </div>
+            <button class="game-start-btn">开始</button>
+          </div>
+          <div class="game-item" data-game="werewolf">
+            <div class="game-icon">🐺</div>
+            <div class="game-info">
+              <div class="game-name">狼人杀</div>
+              <div class="game-desc">经典推理 · 需要 6-12 人</div>
+            </div>
+            <button class="game-start-btn">开始</button>
+          </div>
+          <div class="game-item" data-game="draw-guess">
+            <div class="game-icon">🎨</div>
+            <div class="game-info">
+              <div class="game-name">你画我猜</div>
+              <div class="game-desc">画的人辛苦 · 猜的人乐</div>
+            </div>
+            <button class="game-start-btn">开始</button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-outline" data-close="gamePickerModal">关闭</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ 商城中心 ============ -->
+<div class="modal" id="shopModal">
+  <div class="modal-content shop-modal">
+    <div class="modal-head"><h3><i class="fa-solid fa-store"></i> 商城中心</h3><div class="modal-head-actions"><span class="shop-coins">💎 <strong id="shopCoins">—</strong></span><button class="icon-btn" data-close="shopModal"><i class="fa-solid fa-xmark"></i></button></div></div>
+
+    <div class="shop-cats">
+      <button class="scat active" data-shop-cat="gift"><i class="fa-solid fa-gift"></i> 礼物</button>
+      <button class="scat" data-shop-cat="title"><i class="fa-solid fa-crown"></i> 称号</button>
+      <button class="scat" data-shop-cat="avatar_frame"><i class="fa-solid fa-frame"></i> 头像框</button>
+      <button class="scat" data-shop-cat="effect"><i class="fa-solid fa-wand-magic-sparkles"></i> 特效</button>
+    </div>
+
+    <div class="shop-grid" id="shopGrid"></div>
+
+    <div class="shop-section-head"><h4><i class="fa-solid fa-user-check"></i> 我的物品</h4><button class="btn-ghost tiny" id="toggleInventoryBtn">查看背包</button></div>
+    <div class="shop-inventory hidden" id="shopInventory"></div>
+  </div>
+</div>
+
+<!-- ============ 关系确认弹窗 ============ -->
+<div class="modal" id="relConfirmModal">
+  <div class="modal-content rel-modal">
+    <button class="icon-btn" data-close="relConfirmModal" style="position:absolute;right:12px;top:12px"><i class="fa-solid fa-xmark"></i></button>
+    <div class="rel-confirm-head">
+      <div class="rel-confirm-icon" id="relConfirmIcon">💞</div>
+      <h3 id="relConfirmTitle">建立情侣关系？</h3>
+      <p id="relConfirmDesc">双方好感度已达标，建立后将解锁专属称号和特权</p>
+    </div>
+    <div class="rel-confirm-body">
+      <div class="rel-users">
+        <div class="rel-user"><div class="rel-avatar"><img id="relConfirmMe" src=""></div><span>我</span></div>
+        <div class="rel-heart"><i class="fa-solid fa-heart"></i></div>
+        <div class="rel-user"><div class="rel-avatar"><img id="relConfirmPeer" src=""></div><span id="relConfirmPeerName">对方</span></div>
+      </div>
+      <div class="rel-fav-bar">
+        <div class="rel-fav-label"><span>双方好感度</span><strong id="relConfirmMutual">0</strong></div>
+        <div class="rel-fav-progress"><div class="rel-fav-fill" id="relConfirmFill"></div></div>
+        <div class="rel-fav-sub" id="relConfirmSub">需要 100 才能绑定情侣 💏</div>
+      </div>
+      <div class="rel-rewards" id="relConfirmRewards"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline" data-close="relConfirmModal">再等等</button>
+      <button class="btn-primary" id="relConfirmBindBtn"><i class="fa-solid fa-heart"></i> 确认绑定</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 好感度详情弹窗 ============ -->
+<div class="modal" id="favDetailModal">
+  <div class="modal-content fav-detail-modal">
+    <button class="icon-btn" data-close="favDetailModal" style="position:absolute;right:12px;top:12px"><i class="fa-solid fa-xmark"></i></button>
+    <div class="fav-detail-head">
+      <div class="fav-avatar-wrap"><div class="fav-avatar"><img id="favDetailImg" src=""></div></div>
+      <div class="fav-detail-meta">
+        <h3 id="favDetailName">—</h3>
+        <div class="fav-detail-tags" id="favDetailTags"></div>
+      </div>
+    </div>
+    <div class="fav-detail-body">
+      <div class="fav-dual-bar">
+        <div class="fav-dual-row">
+          <span>你 → TA</span>
+          <div class="fav-dual-track"><div class="fav-dual-fill from" id="favFromFill"></div></div>
+          <strong id="favFromVal">0</strong>
+        </div>
+        <div class="fav-dual-row">
+          <span>TA → 你</span>
+          <div class="fav-dual-track"><div class="fav-dual-fill to" id="favToFill"></div></div>
+          <strong id="favToVal">0</strong>
+        </div>
+        <div class="fav-mutual-row">
+          <span>双向好感度合计</span><strong id="favMutualVal">0</strong>
+        </div>
+      </div>
+      <div class="fav-action-row">
+        <button class="btn-outline" id="favDetailChatBtn"><i class="fa-regular fa-comment-dots"></i> 聊聊</button>
+        <button class="btn-outline" id="favDetailGiftBtn"><i class="fa-solid fa-gift"></i> 送个礼</button>
+        <button class="btn-primary" id="favDetailBindBtn"><i class="fa-solid fa-ring"></i> 申请绑定</button>
+      </div>
+      <div class="fav-history" id="favHistory"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Toast ============ -->
+<div class="toast" id="toast"></div>
+
+<!-- ============ 媒体预览（图片/视频） ============ -->
+<div class="media-preview-overlay" id="mediaPreviewOverlay">
+  <button class="media-preview-close" id="mediaPreviewClose" type="button"><i class="fa-solid fa-xmark"></i></button>
+  <img id="mediaPreviewImg" alt="">
+  <video id="mediaPreviewVideo" controls playsinline></video>
+</div>
+
+<!-- ============ 支付弹窗（微信扫码） ============ -->
+<div class="modal-overlay hidden" id="payModal">
+  <div class="modal-content pay-modal-content">
+    <div class="pay-modal-header">
+      <h3>扫码支付</h3>
+      <button class="icon-btn" onclick="closeModal('payModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="pay-modal-body">
+      <div class="pay-info">
+        <span>支付方式：<strong id="payMethod">微信支付</strong></span>
+        <span>支付项目：<strong id="payAmount">--</strong></span>
+      </div>
+      <div class="pay-qr-wrap">
+        <div id="payQrCode"></div>
+        <p class="pay-tip">请使用微信扫描二维码完成支付</p>
+      </div>
+      <div class="pay-loading">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span>等待支付结果...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="api.js?v=6"></script>
+<script src="app.js?v=9"></script>
+</body>
+</html>
