@@ -1,0 +1,18 @@
+# ============================================================
+# Netlify 重定向规则
+# 将 /api 和 /ws 代理到你的后端服务器
+# 部署后端后，把下面的 https://YOUR-BACKEND-URL 替换为实际后端地址
+# 例如：https://circle-voice-api.onrender.com
+# ============================================================
+
+# 管理后台直接由 Netlify 提供（静态文件）
+/admin    /admin.html    200
+
+# API 接口代理到后端
+/api/*    https://YOUR-BACKEND-URL/api/:splat    200
+
+# WebSocket 代理到后端
+/ws       wss://YOUR-BACKEND-URL/ws              200
+
+# SPA 回退：未知路径返回首页
+/*        /index.html                            200
