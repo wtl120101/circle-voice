@@ -1,0 +1,35 @@
+# ============================================================
+# 圈圈语音社 - Render 蓝图配置
+# 用法：在 Render 控制台选择 "Deploy from blueprint" 上传此文件，
+# 或连接 Git 仓库后 Render 自动识别 render.yaml
+# ============================================================
+
+services:
+  - type: web
+    name: circle-voice-api
+    runtime: docker
+    rootDir: .
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /api/rel-types
+    autoDeploy: true
+    envVars:
+      - key: TOKEN_SECRET
+        sync: false
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+        value: CircleVoice@2026
+      - key: CORS_ORIGINS
+        sync: false
+        value: https://your-netlify-site.netlify.app
+      - key: STATIC_DIR
+        sync: false
+        value: /app/static
+      - key: DATABASE_URL
+        sync: false
+        value: sqlite:///./circle_voice.db
+      - key: ADMIN_TOKEN_EXPIRE_HOURS
+        sync: false
+        value: "2"
