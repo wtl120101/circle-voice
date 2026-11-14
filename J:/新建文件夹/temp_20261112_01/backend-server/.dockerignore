@@ -1,0 +1,22 @@
+# Docker 构建时排除的文件
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.db
+*.db-shm
+*.db-wal
+*.sqlite3
+.env
+*.log
+venv
+logs
+uploads
+screenshots
+.trae
+.vscode
+.idea
+node_modules
+README.txt
+deploy.ps1
