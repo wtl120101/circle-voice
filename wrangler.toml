@@ -1,7 +1,7 @@
 # Cloudflare Workers + 静态资源部署配置
 # 入口 Worker 负责把 /api/* 与 /uploads/* 代理到 Railway 后端，其余请求交给静态资源
 name = "circle-voice"
-compatibility_date = "2026-11-15"
+compatibility_date = "2025-01-01"
 main = "frontend-cloudflare/_worker.js"
 
 [assets]
