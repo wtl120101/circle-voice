@@ -1053,6 +1053,74 @@ async def broadcast_room_state(room_id):
 def init_database():
     metadata.create_all(engine)
     with engine.begin() as conn:
+        # 创建 migrate.py 中定义但不在 metadata 中的表
+        conn.execute(text("""CREATE TABLE IF NOT EXISTS real_names (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL UNIQUE,
+            real_name VARCHAR(40) NOT NULL,
+            id_card VARCHAR(30) NOT NULL,
+            phone VARCHAR(20),
+            face_image TEXT,
+            status INTEGER DEFAULT 0,
+            reject_reason VARCHAR(200),
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            verified_at DATETIME
+        )"""))
+        conn.execute(text("""CREATE TABLE IF NOT EXISTS product_orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_no VARCHAR(32) UNIQUE NOT NULL,
+            user_id INTEGER NOT NULL,
+            item_id INTEGER NOT NULL,
+            quantity INTEGER DEFAULT 1,
+            unit_price INTEGER NOT NULL,
+            total_price INTEGER NOT NULL,
+            currency VARCHAR(10) DEFAULT 'coins',
+            receiver_name VARCHAR(40),
+            receiver_phone VARCHAR(20),
+            receiver_address TEXT,
+            status VARCHAR(20) DEFAULT 'pending',
+            tracking_no VARCHAR(40),
+            remark VARCHAR(200),
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            paid_at DATETIME,
+            shipped_at DATETIME,
+            completed_at DATETIME
+        )"""))
+        conn.execute(text("""CREATE TABLE IF NOT EXISTS recharge_orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_no VARCHAR(32) UNIQUE NOT NULL,
+            user_id INTEGER NOT NULL,
+            product_key VARCHAR(40) NOT NULL,
+            coins INTEGER NOT NULL,
+            bonus_coins INTEGER DEFAULT 0,
+            amount REAL NOT NULL,
+            pay_method VARCHAR(20),
+            status VARCHAR(20) DEFAULT 'pending',
+            paid_at DATETIME,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )"""))
+        conn.execute(text("""CREATE TABLE IF NOT EXISTS bgm_tracks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title VARCHAR(120) NOT NULL,
+            artist VARCHAR(80),
+            url TEXT NOT NULL,
+            cover TEXT,
+            duration INTEGER,
+            category VARCHAR(40),
+            plays INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )"""))
+        conn.execute(text("""CREATE TABLE IF NOT EXISTS mini_games (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_key VARCHAR(40) UNIQUE NOT NULL,
+            name VARCHAR(80) NOT NULL,
+            icon VARCHAR(32),
+            description TEXT,
+            max_players INTEGER DEFAULT 8,
+            min_players INTEGER DEFAULT 2,
+            available INTEGER DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )"""))
         # 迁移：为已有 orders 表补充 out_trade_no 列
         cols = [row[1] for row in conn.execute(text("PRAGMA table_info(orders)")).fetchall()]
         if "out_trade_no" not in cols:
